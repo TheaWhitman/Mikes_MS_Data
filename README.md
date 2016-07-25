@@ -97,6 +97,43 @@ Mean:	1	455.607	455.607	0.446866	5.2453
 # of Seqs:	13483396
 
 ```
+```
+mothur > count.seqs(name=current, group=current)
+Using clado.contigs.good.groups as input file for the group parameter.
+Using clado.trim.contigs.good.names as input file for the name parameter.
+
+Using 50 processors.
+It took 123 secs to create a table for 11115326 sequences.
+
+
+Total number of sequences: 11115326
+
+Output File Names: 
+clado.trim.contigs.good.count_table
+
+
+mothur > summary.seqs(count=clado.trim.contigs.good.count_table)
+Using clado.trim.contigs.good.unique.fasta as input file for the fasta parameter.
+
+Using 50 processors.
+
+		Start	End	NBases	Ambigs	Polymer	NumSeqs
+Minimum:	1	248	248	0	3	1
+2.5%-tile:	1	438	438	0	4	277884
+25%-tile:	1	441	441	0	4	2778832
+Median: 	1	460	460	0	5	5557664
+75%-tile:	1	462	462	0	6	8336495
+97.5%-tile:	1	465	465	0	6	10837443
+Maximum:	1	475	475	0	209	11115326
+Mean:	1	454.559	454.559	0	4.94141
+# of unique seqs:	5071916
+total # of seqs:	11115326
+
+Output File Names: 
+clado.trim.contigs.good.unique.summary
+
+It took 79 secs to summarize 11115326 sequences.
+```
 ---
 
 QIIME

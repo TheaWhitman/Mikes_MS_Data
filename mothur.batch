@@ -1,8 +1,33 @@
 # Put this file in the working directory, run747. 
 make.contigs(file=clado.files, processors=50)
-screen.seqs(fasta=current, group=current, maxambig=0, maxlength=275)
+screen.seqs(fasta=current, group=current, maxambig=0, maxlength=475)
+# screen.seqs(fasta=clado.trim.contigs.fasta, group=clado.contigs.groups, maxambig=0, maxlength=475, processors=50)
 unique.seqs()
 count.seqs(name=current, group=current)
+summary.seqs(count=clado.trim.contigs.good.count_table)
+
+-------------
+mothur > get.current()
+[WARNING]: Cannot determine number of physical pages
+
+Current RAM usage: 7.27827 Gigabytes. Total Ram: 0 Gigabytes.
+
+Current files saved by mothur:
+fasta=clado.trim.contigs.good.unique.fasta
+group=clado.contigs.good.groups
+name=clado.trim.contigs.good.names
+count=clado.trim.contigs.good.count_table
+processors=50
+summary=clado.trim.contigs.good.unique.summary
+
+Current default directory saved by mothur: /home/braus/mothur/
+
+Current working directory: /home/braus/run747/
+
+Output File Names: 
+current_files.summary
+------------
+
 align.seqs(fasta=current, reference=silva.v4.fasta)
 screen.seqs(fasta=current, count=current, start=1968, end=11550, maxhomop=8)
 filter.seqs(fasta=current, vertical=T, trump=.)
