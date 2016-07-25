@@ -24,6 +24,7 @@ Move all "clado" files for mothur into run747.
 
 mothur [MiSeq_SOP](http://www.mothur.org/wiki/MiSeq_SOP)
 
+```
 mothur > count.groups(group=clado.contigs.groups)
 C172N1 contains 323763.
 C172N2 contains 226990.
@@ -95,6 +96,7 @@ Maximum:	1	502	502	77	251	13483396
 Mean:	1	455.607	455.607	0.446866	5.2453
 # of Seqs:	13483396
 
+```
 ---
 
 QIIME
