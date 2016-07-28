@@ -2,17 +2,6 @@ Mike's MS Data
 
 ---
 
-Install [PEAR](https://github.com/xflouris/PEAR).
-
-```
-unzip run747.zip
-cd run747
-gunzip *.gz
-git clone https://github.com/michaeljbraus/Mikes_MS_Data
-```
-
----
-
 mothur
 
 Install [mothur](https://github.com/mothur/mothur/releases)
@@ -134,8 +123,75 @@ clado.trim.contigs.good.unique.summary
 
 It took 79 secs to summarize 11115326 sequences.
 ```
----
 
+Using align.seqs() requires knowing the position of your 16S amplicons (see [this blog post](http://blog.mothur.org/2016/07/07/Customization-for-your-region/) by Pat Schloss) in the Silva database, which has a lot of gaps. 16S is usually ~1,500 bases while Silva is ~50,000 characters. 
+
+```
+align.seqs(fasta=ecoli_v3.fasta, reference=silva.seed_v123.align)
+summary.seqs(fasta=ecoli_v3v4.align)
+
+                Start   End     NBases  Ambigs  Polymer NumSeqs
+Minimum:        6334    25432   471     0       6       1
+2.5%-tile:      6334    25432   471     0       6       1
+25%-tile:       6334    25432   471     0       6       1
+Median:         6334    25432   471     0       6       1
+75%-tile:       6334    25432   471     0       6       1
+97.5%-tile:     6334    25432   471     0       6       1
+Maximum:        6334    25432   471     0       6       1
+Mean:   6334    25432   471     0       6
+# of Seqs:      1
+```
+
+Enter the Silva positions to trim the reference alignment and save on computing: 
+
+`pcr.seqs(fasta=silva.bacteria.fasta, start=6334, end=25432, keepdots=F, processors=8)`
+
+```
+...
+                Start   End     NBases  Ambigs  Polymer NumSeqs
+Minimum:        1       19098   425     0       3       1
+2.5%-tile:      52      19098   445     0       4       374
+25%-tile:       52      19098   448     0       4       3740
+Median:         52      19098   467     0       5       7479
+75%-tile:       52      19098   470     0       5       11218
+97.5%-tile:     52      19098   471     1       6       14583
+Maximum:        53      19098   512     5       9       14956
+Mean:   51.9631 19098   460.356 0.103036        4.86734
+# of Seqs:      14956
+
+...
+Median:         54      18982   460     0       5       2535959
+75%-tile:       54      18982   464     0       6       3803938
+97.5%-tile:     54      18982   466     0       7       4945119
+Maximum:        19098   19098   475     0       209     5071916
+Mean:   232.908 18938.3 450.748 0       4.9889
+# of Seqs:      5071916
+```
+So 54 and 18982 become the start and end for screen.seqs():
+`screen.seqs(fasta=current, count=current, start=54, end=18982, maxhomop=8)`
+
+Summary of filter.seqs():
+```
+Length of filtered alignment: 1448
+Number of columns removed: 17650
+Length of the original alignment: 19098
+Number of sequences used to construct filter: 4849150
+```
+
+Opted to use 4 differences between sequences instead of 2 because these assembled reads are ~460nt. Schloss MiSeq_SOP: "We generally favor allowing 1 difference for every 100 bp of sequence."
+`pre.cluster(fasta=current, count=current, diffs=4)`
+
+
+---
+Install [PEAR](https://github.com/xflouris/PEAR).
+
+```
+unzip run747.zip
+cd run747
+gunzip *.gz
+git clone https://github.com/michaeljbraus/Mikes_MS_Data
+```
+---
 QIIME
 
 Install [QIIME](http://qiime.org/install/install.html#installing-qiime-natively-with-a-minimal-base-install).
