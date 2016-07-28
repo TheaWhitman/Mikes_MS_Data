@@ -179,10 +179,13 @@ Number of sequences used to construct filter: 4849150
 ```
 
 Opted to use 4 differences between sequences instead of 2 because these assembled reads are ~460nt. Schloss MiSeq_SOP: "We generally favor allowing 1 difference for every 100 bp of sequence."
+
 `pre.cluster(fasta=current, count=current, diffs=4)`
 
 
 ---
+Want to just assemble the paired-end reads? 
+
 Install [PEAR](https://github.com/xflouris/PEAR).
 
 ```
@@ -191,12 +194,8 @@ cd run747
 gunzip *.gz
 git clone https://github.com/michaeljbraus/Mikes_MS_Data
 ```
----
-QIIME
 
-Install [QIIME](http://qiime.org/install/install.html#installing-qiime-natively-with-a-minimal-base-install).
-
-version 1.8.0
+Example: 
 
 Run PEAR on all files:
 ```
