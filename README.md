@@ -197,6 +197,7 @@ Mean:   1.00014 1448    454.301 0       5.00405
 # of Seqs:      42246
 ```
 
+...
 
 ---
 Want to just assemble the paired-end reads? 

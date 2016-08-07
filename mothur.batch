@@ -1,7 +1,7 @@
 # Put this file in the working directory, run747, with the silva database and trainsets. 
 
 # Process paired-end reads, screen, cluster, and classify. 
-make.contigs(file=clado.files, processors=20)
+make.contigs(file=clado.files, processors=7)
 screen.seqs(fasta=current, group=current, maxambig=0, maxlength=475)
 unique.seqs()
 count.seqs(name=current, group=current)
@@ -16,54 +16,9 @@ chimera.uchime(fasta=current, count=current, dereplicate=t)
 remove.seqs(fasta=current, accnos=current)
 classify.seqs(fasta=current, count=current, reference=trainset9_032012.pds.fasta, taxonomy=trainset9_032012.pds.tax, cutoff=80)
 remove.lineage(fasta=current, count=current, taxonomy=current, taxon=Chloroplast-Mitochondria-unknown-Archaea-Eukaryota)
-
 cluster.split(fasta=current, count=current, taxonomy=current, splitmethod=classify, taxlevel=4, cutoff=0.15)
-
 make.shared(list=current, count=current, label=0.03)
-
 classify.otu(list=current, count=current, taxonomy=current, label=0.03)
 phylotype(taxonomy=current)
 make.shared(list=current, count=current, label=1)
 classify.otu(list=current, count=current, taxonomy=current, label=1)
-
-
-
-# Analysis
-system(mv clado.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.an.unique_list.shared clado.an.shared)
-system(mv clado.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.an.unique_list.0.03.cons.taxonomy clado.an.cons.taxonomy)
-count.groups(shared=clado.an.shared)
-sub.sample(shared=stability.an.shared, size=____)
-rarefaction.single(shared=clado.an.shared, calc=sobs, freq=100)
-summary.single(shared=clado.an.shared, calc=nseqs-coverage-sobs-invsimpson, subsample=____)
-# Heatmaps
-heatmap.bin(shared=clado.an.0.03.subsample.shared, scale=log2, numotu=50) 
-dist.shared(shared=clado.an.shared, calc=thetayc-jclass, subsample=____)
-heatmap.sim(phylip=clado.an.thetayc.0.03.lt.ave.dist)
-heatmap.sim(phylip=clado.an.jclass.0.03.lt.ave.dist)
-# Venn diagram of three samples from two times and two places
-venn(shared=stability.an.0.03.subsample.shared, groups=C172N1-C172N2-C172S1-C172S2)
-tree.shared(phylip=clado.an.thetayc.0.03.lt.ave.dist)
-# Make and use site and time design files. 
-parsimony(tree=clado.an.thetayc.0.03.lt.ave.tre, group=clado.time.design,  groups=all)
-parsimony(tree=clado.an.thetayc.0.03.lt.ave.tre, group=clado.site.design,  groups=all)
-pcoa(phylip=clado.an.thetayc.0.03.lt.ave.dist)
-nmds(phylip=clado.an.thetayc.0.03.lt.ave.dist)
-nmds(phylip=clado.an.thetayc.0.03.lt.ave.dist, mindim=3, maxdim=3)
-amova(phylip=clado.an.thetayc.0.03.lt.ave.dist, design=clado.time.design)
-amova(phylip=clado.an.thetayc.0.03.lt.ave.dist, design=clado.site.design)
-homova(phylip=clado.an.thetayc.0.03.lt.ave.dist, design=clado.time.design)
-corr.axes(axes=clado.an.thetayc.0.03.lt.ave.nmds.axes, shared=clado.an.0.03.subsample.shared, method=spearman, numaxes=3)
-# Make file with average water temps on sampling days. 
-corr.axes(axes=clado.an.thetayc.0.03.lt.ave.nmds.axes, metadata=clado.temp.metadata, method=spearman, numaxes=3)
-get.communitytype(shared=clado.an.0.03.subsample.shared)
-# Pop-level analysis
-metastats(shared=clado.an.0.03.subsample.shared, design=clado.time.design)
-metastats(shared=clado.an.0.03.subsample.shared, design=clado.site.design)
-indicator(shared=clado.an.0.03.subsample.shared, design=clado.time.design)
-indicator(shared=clado.an.0.03.subsample.shared, design=clado.site.design)
-classify.rf(shared=clado.an.0.03.subsample.shared, design=clado.time.design)
-classify.rf(shared=clado.an.0.03.subsample.shared, design=clado.site.design)
-# Phylogeny-based analysis
-phylo.diversity(tree=clado.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.phylip.tre, count=clado.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.pick.count_table, rarefy=T)
-unifrac.unweighted(tree=clado.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.phylip.tre, count=clado.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.pick.count_table, distance=lt, processors=2, random=F, subsample=____)
-unifrac.weighted(tree=clado.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.phylip.tre, count=clado.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.pick.count_table, distance=lt, processors=2, random=F, subsample=____)
