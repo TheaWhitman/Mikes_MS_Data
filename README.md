@@ -182,6 +182,21 @@ Opted to use 4 differences between sequences instead of 2 because these assemble
 
 `pre.cluster(fasta=current, count=current, diffs=4)`
 
+...
+```
+> summary.seqs(fasta=clado.trim.contigs.good.unique.good.filter.unique.precluster.fasta, processors=50)
+                Start   End     NBases  Ambigs  Polymer NumSeqs
+Minimum:        1       1446    418     0       3       1
+2.5%-tile:      1       1448    439     0       4       1057
+25%-tile:       1       1448    441     0       4       10562
+Median:         1       1448    460     0       5       21124
+75%-tile:       1       1448    461     0       6       31685
+97.5%-tile:     1       1448    465     0       7       41190
+Maximum:        2       1448    475     0       8       42246
+Mean:   1.00014 1448    454.301 0       5.00405
+# of Seqs:      42246
+```
+
 
 ---
 Want to just assemble the paired-end reads? 
