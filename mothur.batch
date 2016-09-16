@@ -1,10 +1,7 @@
 # Put this file in the working directory, run747, with the silva database and trainsets.
-
-# Subsample to save on computing near pre.cluster() step later.
-sub.sample(fasta=...)
-
 # Process paired-end reads, screen, cluster, and classify.
 make.contigs(file=clado.files, processors=7)
+sub.sample(size = 10000)
 screen.seqs(fasta=current, group=current, maxambig=0, maxlength=475)
 unique.seqs()
 count.seqs(name=current, group=current)
