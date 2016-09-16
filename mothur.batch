@@ -1,11 +1,14 @@
-# Put this file in the working directory, run747, with the silva database and trainsets. 
+# Put this file in the working directory, run747, with the silva database and trainsets.
 
-# Process paired-end reads, screen, cluster, and classify. 
+# Subsample to save on computing near pre.cluster() step later.
+sub.sample(fasta=...)
+
+# Process paired-end reads, screen, cluster, and classify.
 make.contigs(file=clado.files, processors=7)
 screen.seqs(fasta=current, group=current, maxambig=0, maxlength=475)
 unique.seqs()
 count.seqs(name=current, group=current)
-pcr.seqs(fasta=silva.bacteria/silva.bacteria.fasta, start=6334, end=25432, keepdots=F, processors=20) 
+pcr.seqs(fasta=silva.bacteria/silva.bacteria.fasta, start=6334, end=25432, keepdots=F, processors=20)
 system(mv silva.bacteria/silva.bacteria.pcr.fasta silva.bacteria/silva.v3v4.fasta)
 align.seqs(fasta=clado.trim.contigs.good.unique.fasta, reference=silva.bacteria/silva.v3v4.fasta)
 screen.seqs(fasta=current, count=current, start=54, end=18982, maxhomop=8)
