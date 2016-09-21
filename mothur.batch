@@ -86,17 +86,18 @@ amova(phylip=clado.an.thetayc.0.03.lt.ave.dist, design=clado.time.design)
 #homova(phylip=clado.an.thetayc.0.03.lt.ave.dist, design=clado.site.design)
 homova(phylip=clado.an.thetayc.0.03.lt.ave.dist, design=clado.time.design)
 corr.axes(axes=clado.an.thetayc.0.03.lt.ave.nmds.axes, shared=clado.an.0.03.subsample.shared, method=spearman, numaxes=3)
-# Make file with average water temps on sampling days.
-get.communitytype(shared=clado.an.0.03.subsample.shared)
-
+# Make file with average water temps on sampling days. (Takes way too long.)
+#get.communitytype(shared=clado.an.0.03.subsample.shared)
 # Pop-level analysis
 metastats(shared=clado.an.0.03.subsample.shared, design=clado.time.design)
 #metastats(shared=clado.an.0.03.subsample.shared, design=clado.site.design)
-indicator(shared=clado.an.0.03.subsample.shared, design=clado.time.design)
-#indicator(shared=clado.an.0.03.subsample.shared, design=clado.site.design)
 classify.rf(shared=clado.an.0.03.subsample.shared, design=clado.time.design)
 #classify.rf(shared=clado.an.0.03.subsample.shared, design=clado.site.design)
+
+make.biom(shared=clado.an.shared, metadata=clado.metadata)
+
+### Not refactored:
 # Phylogeny-based analysis
-phylo.diversity(tree=clado.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.phylip.tre, count=clado.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.pick.count_table, rarefy=T)
-unifrac.unweighted(tree=clado.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.phylip.tre, count=clado.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.pick.count_table, distance=lt, processors=2, random=F, subsample=____)
-unifrac.weighted(tree=clado.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.phylip.tre, count=clado.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.pick.count_table, distance=lt, processors=2, random=F, subsample=____)
+#phylo.diversity(tree=clado.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.phylip.tre, count=clado.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.pick.count_table, rarefy=T)
+#unifrac.unweighted(tree=clado.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.phylip.tre, count=clado.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.pick.count_table, distance=lt, processors=2, random=F, subsample=____)
+#unifrac.weighted(tree=clado.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.phylip.tre, count=clado.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.pick.count_table, distance=lt, processors=2, random=F, subsample=____)
