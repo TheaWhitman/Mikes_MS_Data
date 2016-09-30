@@ -5,7 +5,7 @@ library(ggplot2)
 library(dplyr)
 setwd("~/Dropbox/Mikes_MS_Data/")
 # Load biom file. 
-biom <- import_biom("OTU_table.biom", parseFunction=parse_taxonomy_greengenes); head(biom)
+biom <- import_biom("OTU_table.biom", parseFunction=parse_taxonomy_greengenes)
 sam.data <- read.csv(file="sample.data.csv", row.names=1, header=TRUE)
 head(sam.data)
 sample_data(biom) <- sam.data 
@@ -54,9 +54,16 @@ p
 biom.rich <- plot_richness(biom, x="Date", color="SampleSite")
 biom.rich
 #dev.off()
-# Stacked bar charts of methanotrophs. 
+# Bar plots.
+
+# Stacked bar plots of methanotrophs. 
 rank_names(biom.relabund); sample_data(biom.relabund)
 #pdf(file="figs/barstack.methanos.pdf", height=8, width=12)
 barstack.methanos <- plot_bar(biom.relabund.methanos, x = "Date", fill="SampleSite") + facet_wrap(~Genus, scales="free_y")
 barstack.methanos
+#dev.off()
+# Network plot. 
+#pdf(file="figs/network.pdf", height=8, width=12)
+network <- plot_net(biom, maxdist = 0.3, point_label = "SampleID.1", color = "Date", shape = "SampleSite")
+network
 #dev.off()
