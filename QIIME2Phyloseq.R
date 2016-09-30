@@ -19,8 +19,9 @@ ord.k3 <- plot_ordination(biom.relabund, ordNMDS.k3, shape="SampleSite", color="
   geom_point(size=4) + 
   facet_wrap(~SampleSite) + 
   labs(title = "Cladophora, 2014")
-pdf(file="figs/ord.k3.pdf", height=6, width=15)
-ord.k3; dev.off()
+#pdf(file="figs/ord.k3.pdf", height=6, width=15)
+ord.k3
+#dev.off()
 # ANOSIM...
 # Remove singleton. (EDA)
 biom.nosingle <- prune_taxa(taxa_sums(biom)>1, biom)
@@ -42,5 +43,6 @@ head(relabund.methanos.genus)
 # 
 p <- ggplot(relabund.methanos.genus, aes(Date, GenusAbundance, color = SampleSite))
 p <- p + geom_boxplot() + facet_wrap(~Genus, scales="free_y")
-pdf(file="figs/methanos.relabund.pdf", height=8, width=15)
-p; dev.off()
+#pdf(file="figs/methanos.relabund.pdf", height=8, width=15)
+p
+#dev.off()

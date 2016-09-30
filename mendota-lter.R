@@ -54,6 +54,7 @@ clado.depth.zoom.sixteen <- subset(clado.depth, daynum>=150 & daynum<=250 & year
 sixteen <- qplot(clado.depth.zoom.sixteen$daynum, y = clado.depth.zoom.sixteen$wtemp) + geom_point(aes(colour = clado.depth.zoom.sixteen$year4), size=2) + labs(title = "Water Temperature at or below1.5m, 2016", x="julian day", y="temperature °C") + geom_vline(xintercept=Jdays, colour="darkgrey", linetype = "longdash") + guides(color=guide_legend(title="year")) + scale_colour_gradient(low = "black") + nolegend
 sixteen
 # All plots in grid. 
-pdf(file="figs/wtemp_alldepths_2011-16.pdf", height=8, width=15)
+#pdf(file="figs/wtemp_alldepths_2011-16.pdf", height=8, width=15)
 allplots <- grid.arrange(eleven,twelve,thirteen,fourteen,fifteen,sixteen, ncol=3)
-allplots; dev.off()
+allplots
+#dev.off()
