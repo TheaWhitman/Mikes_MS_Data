@@ -9,8 +9,11 @@ biom <- import_biom("OTU_table.biom", parseFunction=parse_taxonomy_greengenes); 
 sam.data <- read.csv(file="sample.data.csv", row.names=1, header=TRUE)
 head(sam.data)
 sample_data(biom) <- sam.data 
-biom
+biom; sample_data(biom)
 head(otu_table(biom))
+# Custom plotting. 
+nolegend <- theme(legend.position="none")
+readabund <- labs(y="read abundance")
 # Normalize by relative abundance. 
 biom.relabund <- transform_sample_counts(biom, function(x) x / sum(x))
 ordNMDS <- ordinate(biom.relabund, method="NMDS", distance="bray")
@@ -45,4 +48,15 @@ p <- ggplot(relabund.methanos.genus, aes(Date, GenusAbundance, color = SampleSit
 p <- p + geom_boxplot() + facet_wrap(~Genus, scales="free_y")
 #pdf(file="figs/methanos.relabund.pdf", height=8, width=15)
 p
+#dev.off()
+# Plot richness. 
+#pdf(file="figs/richness.pdf", height=8, width=20)
+biom.rich <- plot_richness(biom, x="Date", color="SampleSite")
+biom.rich
+#dev.off()
+# Stacked bar charts of methanotrophs. 
+rank_names(biom.relabund); sample_data(biom.relabund)
+#pdf(file="figs/barstack.methanos.pdf", height=8, width=12)
+barstack.methanos <- plot_bar(biom.relabund.methanos, x = "Date", fill="SampleSite") + facet_wrap(~Genus, scales="free_y")
+barstack.methanos
 #dev.off()
