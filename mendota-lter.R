@@ -1,7 +1,7 @@
 library(ggplot2)
 library(grid)
 library(gridExtra)
-setwd("~/Dropbox/Mikes_MS_Data/")
+setwd("~/Dropbox/clado-manuscript/Mikes_MS_Data/")
 data <- read.csv("north_temperate_lakes_lter__daily_water_temperature_-_lake_mendota.csv", header=T)
 head(data)
 nolegend <- theme(legend.position="none")
@@ -24,37 +24,6 @@ zoom1 <- qplot(clado.depth.zoom$daynum, y = clado.depth.zoom$wtemp) +
   geom_vline(xintercept=Jdays, colour="darkgreen", linetype = "longdash") + 
   guides(color=guide_legend(title="year")) + scale_colour_gradient(low = "darkred")
 zoom1
-# 2011
-clado.depth.zoom.eleven <- subset(clado.depth, daynum>=150 & daynum<=250 & year4==2011, select = year4:wtemp)
-eleven <- qplot(clado.depth.zoom.eleven$daynum, y = clado.depth.zoom.eleven$wtemp) + 
-  geom_point(aes(colour = clado.depth.zoom.eleven$year4), size=2) + 
-  labs(title = "Water Temperature at or below1.5m, 2011", x="julian day", y="temperature °C") + 
-  geom_vline(xintercept=Jdays, colour="darkgrey", linetype = "longdash") + 
-  guides(color=guide_legend(title="year")) + scale_colour_gradient(low = "black") + 
-  nolegend
-eleven
-# 2012
-clado.depth.zoom.twelve <- subset(clado.depth, daynum>=150 & daynum<=250 & year4==2012, select = year4:wtemp)
-twelve <- qplot(clado.depth.zoom.twelve$daynum, y = clado.depth.zoom.twelve$wtemp) + geom_point(aes(colour = clado.depth.zoom.twelve$year4), size=2) + labs(title = "Water Temperature at or below1.5m, 2012", x="julian day", y="temperature °C") + geom_vline(xintercept=Jdays, colour="darkgrey", linetype = "longdash") + guides(color=guide_legend(title="year")) + scale_colour_gradient(low = "black") + nolegend
-twelve
-# 2013
-clado.depth.zoom.thirteen <- subset(clado.depth, daynum>=150 & daynum<=250 & year4==2013, select = year4:wtemp)
-thirteen <- qplot(clado.depth.zoom.thirteen$daynum, y = clado.depth.zoom.thirteen$wtemp) + geom_point(aes(colour = clado.depth.zoom.thirteen$year4), size=2) + labs(title = "Water Temperature at or below1.5m, 2013", x="julian day", y="temperature °C") + geom_vline(xintercept=Jdays, colour="darkgrey", linetype = "longdash") + guides(color=guide_legend(title="year")) + scale_colour_gradient(low = "black") + nolegend
-thirteen
-# 2014
-clado.depth.zoom.fourteen <- subset(clado.depth, daynum>=150 & daynum<=250 & year4==2014, select = year4:wtemp)
-fourteen <- qplot(clado.depth.zoom.fourteen$daynum, y = clado.depth.zoom.fourteen$wtemp) + geom_point(aes(colour = clado.depth.zoom.fourteen$year4), size=2) + labs(title = "Water Temperature at or below1.5m, 2014", x="julian day", y="temperature °C") + geom_vline(xintercept=Jdays, colour="darkgrey", linetype = "longdash") + guides(color=guide_legend(title="year")) + scale_colour_gradient(low = "black") + nolegend
-fourteen
-# 2015
-clado.depth.zoom.fifteen <- subset(clado.depth, daynum>=150 & daynum<=250 & year4==2015, select = year4:wtemp)
-fifteen <- qplot(clado.depth.zoom.fifteen$daynum, y = clado.depth.zoom.fifteen$wtemp) + geom_point(aes(colour = clado.depth.zoom.fifteen$year4), size=2) + labs(title = "Water Temperature at or below1.5m, 2015", x="julian day", y="temperature °C") + geom_vline(xintercept=Jdays, colour="darkgrey", linetype = "longdash") + guides(color=guide_legend(title="year")) + scale_colour_gradient(low = "black") + nolegend
-fifteen
-# 2016
-clado.depth.zoom.sixteen <- subset(clado.depth, daynum>=150 & daynum<=250 & year4==2016, select = year4:wtemp)
-sixteen <- qplot(clado.depth.zoom.sixteen$daynum, y = clado.depth.zoom.sixteen$wtemp) + geom_point(aes(colour = clado.depth.zoom.sixteen$year4), size=2) + labs(title = "Water Temperature at or below1.5m, 2016", x="julian day", y="temperature °C") + geom_vline(xintercept=Jdays, colour="darkgrey", linetype = "longdash") + guides(color=guide_legend(title="year")) + scale_colour_gradient(low = "black") + nolegend
-sixteen
-# All plots in grid. 
-#pdf(file="figs/wtemp_alldepths_2011-16.pdf", height=8, width=15)
-allplots <- grid.arrange(eleven,twelve,thirteen,fourteen,fifteen,sixteen, ncol=3)
-allplots
-#dev.off()
+# Smarter way to make grid of plots. 
+p <- ggplot(clado.depth.zoom, aes(daynum, year4))
+p + geom_point() + facet_wrap(~year4)
