@@ -25,5 +25,8 @@ zoom1 <- qplot(clado.depth.zoom$daynum, y = clado.depth.zoom$wtemp) +
   guides(color=guide_legend(title="year")) + scale_colour_gradient(low = "darkred")
 zoom1
 # Smarter way to make grid of plots. 
-p <- ggplot(clado.depth.zoom, aes(daynum, year4))
-p + geom_point() + facet_wrap(~year4)
+#pdf(file="figs/wtemp_lowdepth_grid.pdf", height=6, width=10)
+p <- ggplot(clado.depth.zoom, aes(daynum, wtemp))
+p + geom_point() + ylim(15,30) + facet_wrap(~year4) + geom_vline(xintercept=Jdays, colour="grey", linetype = "longdash") + guides(color=guide_legend(title="Year"))
+#dev.off()
+# Mean of wtemp by days from 2006-2016 pooled. 
