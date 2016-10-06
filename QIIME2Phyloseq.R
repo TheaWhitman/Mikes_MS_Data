@@ -5,7 +5,7 @@ library(ggplot2)
 library(dplyr)
 setwd("~/Dropbox/clado-manuscript/Mikes_MS_Data/")
 # Load biom file. 
-biom <- import_biom("OTU_table.biom", parseFunction=parse_taxonomy_greengenes)
+biom <- import_biom("OTU_table.biom", "~/Dropbox/clado-manuscript/Nephele/PipelineResults_NMEPINZ20QK1/nephele_outputs/tree.tre", parseFunction=parse_taxonomy_greengenes)
 sam.data <- read.csv(file="sample.data.csv", row.names=1, header=TRUE)
 head(sam.data)
 sam.data$DateSite <- paste(sam.data$Date, sam.data$Site)
@@ -20,13 +20,19 @@ readabund <- labs(y="read abundance")
 biom.relabund <- transform_sample_counts(biom, function(x) x / sum(x))
 ordNMDS <- ordinate(biom.relabund, method="NMDS", distance="bray")
 ordNMDS.k3 <- ordinate(biom.relabund, method="NMDS", distance="bray", k=3)
-ord.k3 <- plot_ordination(biom.relabund, ordNMDS.k3, label="Date", shape="Site") + geom_point(size=2.5) + geom_polygon(aes(fill=DateSite)) + scale_color_gradient(low = "grey")
+ord.k3 <- plot_ordination(biom.relabund, ordNMDS.k3, label="Date", shape="Site") + geom_point(size=2, color = "black") + geom_polygon(aes(fill=DateSite), alpha=0.6) + labs(title = "Cladophora, 2014") + theme_bw()
 #pdf(file="figs/ord.k3.pdf", height=7, width=9)
 ord.k3
 #dev.off()
-ord.k3.facet <- plot_ordination(biom.relabund, ordNMDS.k3, shape="Site", color="Date", label = "Date") + geom_point(size=4) + facet_wrap(~Site) + labs(title = "Cladophora, 2014")
-#pdf(file="figs/ord.k3.facet.pdf", height=6, width=15)
-ord.k3.facet
+# Facet by Date. 
+#pdf(file="figs/ord.k3.facet.date.pdf", height=6, width=10)
+ord.k3.facet1 <- plot_ordination(biom.relabund, ordNMDS.k3, shape="Site", label = "Date") + geom_point(size=2.5) + facet_wrap(~Date) + labs(title = "Cladophora, 2014") + geom_polygon(aes(fill=DateSite)) + theme_bw()
+ord.k3.facet1
+#dev.off()
+# Facet by Site. 
+#pdf(file="figs/ord.k3.facet.site.pdf", height=6, width=15)
+ord.k3.facet2 <- plot_ordination(biom.relabund, ordNMDS.k3, label = "Date") + geom_point(size=2.5) + facet_wrap(~Site, ncol = 1) + labs(title = "Cladophora, 2014") + geom_polygon(aes(fill=DateSite)) + theme_bw()
+ord.k3.facet2
 #dev.off()
 # ANOSIM...
 # Remove singleton. (EDA)
@@ -57,8 +63,6 @@ p
 biom.rich <- plot_richness(biom, x="Date", color="Site")
 biom.rich
 #dev.off()
-# Bar plots.
-
 # Stacked bar plots of methanotrophs. 
 rank_names(biom.relabund); sample_data(biom.relabund)
 #pdf(file="figs/barstack.methanos.pdf", height=8, width=12)
@@ -70,3 +74,13 @@ barstack.methanos
 network <- plot_net(biom, maxdist = 0.3, point_label = "SampleID.1", color = "Date", shape = "Site")
 network
 #dev.off()
+# Trees. 
+#pdf(file="figs/Methylococcaceae.tree.pdf", height=8, width=10)
+biom.relabund.Methylococcaceae <- subset_taxa(biom.relabund, Family %in% "Methylococcaceae")
+biom.relabund.Methylococcaceae
+head(tax_table(biom.relabund.Methylococcaceae))
+plot_tree(biom.relabund.Methylococcaceae, color="Date", shape="Site", label.tips="Genus")
+#dev.off()
+
+# Sandbox. 
+p3 <- ggplot(p1$data, p1$mapping) + geom_density2d() + facet_wrap(~Phylum) +  scale_colour_hue(guide = FALSE)
