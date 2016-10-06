@@ -30,7 +30,7 @@ ord.k3.facet1 <- plot_ordination(biom.relabund, ordNMDS.k3, shape="Site", label 
 ord.k3.facet1
 #dev.off()
 # Facet by Site. 
-#pdf(file="figs/ord.k3.facet.site.pdf", height=6, width=15)
+#pdf(file="figs/ord.k3.facet.site.pdf", height=8, width=6)
 ord.k3.facet2 <- plot_ordination(biom.relabund, ordNMDS.k3, label = "Date") + geom_point(size=2.5) + facet_wrap(~Site, ncol = 1) + labs(title = "Cladophora, 2014") + geom_polygon(aes(fill=DateSite)) + theme_bw()
 ord.k3.facet2
 #dev.off()
@@ -75,12 +75,16 @@ network <- plot_net(biom, maxdist = 0.3, point_label = "SampleID.1", color = "Da
 network
 #dev.off()
 # Trees. 
-#pdf(file="figs/Methylococcaceae.tree.pdf", height=8, width=10)
+#pdf(file="figs/Methylococcaceae.tree.site.pdf", height=8, width=10)
 biom.relabund.Methylococcaceae <- subset_taxa(biom.relabund, Family %in% "Methylococcaceae")
 biom.relabund.Methylococcaceae
 head(tax_table(biom.relabund.Methylococcaceae))
-plot_tree(biom.relabund.Methylococcaceae, color="Date", shape="Site", label.tips="Genus")
+tree1 <- plot_tree(biom.relabund.Methylococcaceae, color="Site", shape="Site", label.tips="Genus")
+tree1
+#dev.off()
+#pdf(file="figs/Methylococcaceae.tree.datesite.pdf", height=8, width=10)
+tree2 <- plot_tree(biom.relabund.Methylococcaceae, color="DateSite", label.tips = "Genus")
+tree2
 #dev.off()
 
 # Sandbox. 
-p3 <- ggplot(p1$data, p1$mapping) + geom_density2d() + facet_wrap(~Phylum) +  scale_colour_hue(guide = FALSE)

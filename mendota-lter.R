@@ -27,6 +27,6 @@ zoom1
 # Smarter way to make grid of plots. 
 #pdf(file="figs/wtemp_lowdepth_grid.pdf", height=6, width=10)
 p <- ggplot(clado.depth.zoom, aes(daynum, wtemp))
-p + geom_point() + ylim(15,30) + facet_wrap(~year4) + geom_vline(xintercept=Jdays, colour="grey", linetype = "longdash") + guides(color=guide_legend(title="Year"))
+p <- p + geom_point() + ylim(15,30) + facet_wrap(~year4) + geom_vline(xintercept=Jdays, colour="grey30", linetype = "longdash") + guides(color=guide_legend(title="Year"))
+p
 #dev.off()
-# Mean of wtemp by days from 2006-2016 pooled. 
