@@ -1,0 +1,84 @@
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(fig.width=12, fig.height=8, fig.path='Figs/', warning=FALSE, message=FALSE)
+```
+```{r load_packages, results="hide"}
+#source('http://bioconductor.org/biocLite.R')
+#biocLite('phyloseq')
+library(phyloseq)
+library(ggplot2)
+library(dplyr)
+library(Rmisc)
+setwd("~/Dropbox/clado-manuscript/Mikes_MS_Data/")
+```
+``` {r load_data, results="hide"}
+# Load biom file. 
+biom <- import_biom("OTU_table.biom", "~/Dropbox/clado-manuscript/Nephele/PipelineResults_NMEPINZ20QK1/nephele_outputs/tree.tre", parseFunction=parse_taxonomy_greengenes)
+```
+``` {r merge_metadata}
+sam.data <- read.csv(file="sample.data.csv", row.names=1, header=TRUE)
+head(sam.data)
+sam.data$Date <- as.factor(sam.data$Date)
+sam.data$DateSite <- paste(sam.data$Date, sam.data$Site)
+head(sam.data); str(sam.data)
+sample_data(biom) <- sam.data
+biom; sample_data(biom)
+head(otu_table(biom))
+```
+```{r plotting}
+# Custom plotting. 
+nolegend <- theme(legend.position="none")
+readabund <- labs(y="read abundance")
+# Normalize by relative abundance. 
+biom.relabund <- transform_sample_counts(biom, function(x) x / sum(x))
+ordNMDS <- ordinate(biom.relabund, method="NMDS", distance="bray")
+ordNMDS.k3 <- ordinate(biom.relabund, method="NMDS", distance="bray", k=3)
+ord.k3 <- plot_ordination(biom.relabund, ordNMDS.k3, shape="Site", color = "DateSite") + geom_point(size=2) + geom_polygon(aes(fill=DateSite), alpha=0.7) + labs(title = "Cladophora, 2014") + theme_bw()
+ord.k3
+# Facet by Date. 
+ord.k3.facet1 <- plot_ordination(biom.relabund, ordNMDS.k3, shape="Site", label = "Date") + geom_point(size=2.5) + facet_wrap(~Date) + labs(title = "Cladophora, 2014") + geom_polygon(aes(fill=DateSite)) + theme_bw()
+ord.k3.facet1
+# Facet by Site. 
+ord.k3.facet2 <- plot_ordination(biom.relabund, ordNMDS.k3, label = "Date") + geom_point(size=2.5) + facet_wrap(~Site, ncol = 1) + labs(title = "Cladophora, 2014") + geom_polygon(aes(fill=DateSite)) + theme_bw()
+ord.k3.facet2
+# ANOSIM...
+# Remove singleton. (EDA)
+biom.nosingle <- prune_taxa(taxa_sums(biom)>1, biom)
+biom.nosingle # Same, so QIIME QC covered it. 
+# Find methanotrophs
+methanolist <- read.table(file = "~/Dropbox/clado-manuscript/clado_16S-archive/methanos.txt")
+methanolist <- as.vector(methanolist$V1)
+# 
+biom.relabund.methanos <- subset_taxa(biom.relabund, Genus %in% as.factor(methanolist))
+biom.relabund.methanos
+head(tax_table(biom.relabund.methanos))
+# 
+relabund.methanos <- psmelt(biom.relabund.methanos)
+relabund.methanos.genus <- relabund.methanos%>%
+  group_by(Sample, Genus)%>%
+  mutate(GenusAbundance = sum(Abundance))%>%
+  distinct(Sample, GenusAbundance, TreatmentGroup, Site, Date, Family, Genus)
+head(relabund.methanos.genus)
+# 
+p <- ggplot(relabund.methanos.genus, aes(as.factor(Date), GenusAbundance, color = Site))
+p <- p + geom_point() + facet_wrap(~Genus, scales="free_y")
+p
+
+# Means with error bars
+# stats <- summarySE(biom, measurevar="Abundance", groupvars=c("bacsp","media")); stats
+# p.stats <- ggplot(stats, aes(x = media, y = percloss, fill = bacsp))
+# p.stats + geom_bar(stat = "identity", position=position_dodge(.9)) + geom_errorbar(aes(ymin=percloss-se, ymax=percloss+se), width=.2, colour="darkblue", position=position_dodge(.9)) + geom_rug()  + scale_fill_grey()
+
+# Plot richness. 
+biom.rich <- plot_richness(biom, x="Date", color="Site")
+biom.rich
+
+### Shannon linear model test. 
+#biom.rich[1][1]
+
+# Stacked bar plots of methanotrophs. 
+barstack.methanos <- plot_bar(biom.relabund.methanos, x = "Date", fill="Site") + facet_wrap(~Genus, scales="free_y")
+barstack.methanos
+```
+```{r sandbox}
+# Sandbox. 
+```
