@@ -1,14 +1,14 @@
 ```{r global_options, include=FALSE}
-knitr::opts_chunk$set(fig.width=8, fig.height=6, fig.path='Figs/', warning=FALSE, message=FALSE)
+knitr::opts_chunk$set(fig.width=8, fig.height=6, fig.path='QIIME2Phyloseq-figs/', warning=FALSE, message=FALSE)
 ```
 ```{r load_packages, results="hide"}
+setwd("~/Dropbox/clado-manuscript/Mikes_MS_Data/")
 #source('http://bioconductor.org/biocLite.R')
 #biocLite('phyloseq')
 library(phyloseq)
 library(ggplot2)
 library(dplyr)
 library(Rmisc)
-setwd("~/Dropbox/clado-manuscript/Mikes_MS_Data/")
 ```
 ``` {r load_data, results="hide"}
 # Load biom file. 
@@ -78,7 +78,4 @@ biom.rich
 # Stacked bar plots of methanotrophs. 
 barstack.methanos <- plot_bar(biom.relabund.methanos, x = "Date", fill="Site") + facet_wrap(~Genus, scales="free_y")
 barstack.methanos
-```
-```{r sandbox}
-# Sandbox. 
 ```

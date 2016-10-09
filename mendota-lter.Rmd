@@ -1,3 +1,7 @@
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(fig.width=8, fig.height=6, fig.path='mendota-lter-figs/', warning=FALSE, message=FALSE)
+```
+```{r mendota_lter}
 library(ggplot2)
 library(grid)
 library(gridExtra)
@@ -25,8 +29,7 @@ zoom1 <- qplot(clado.depth.zoom$daynum, y = clado.depth.zoom$wtemp) +
   guides(color=guide_legend(title="year")) + scale_colour_gradient(low = "darkred")
 zoom1
 # Smarter way to make grid of plots. 
-#pdf(file="figs/wtemp_lowdepth_grid.pdf", height=6, width=10)
 p <- ggplot(clado.depth.zoom, aes(daynum, wtemp))
 p <- p + geom_point() + ylim(15,30) + facet_wrap(~year4) + geom_vline(xintercept=Jdays, colour="grey30", linetype = "longdash") + guides(color=guide_legend(title="Year"))
 p
-#dev.off()
+```
