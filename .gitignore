@@ -1,5 +1,6 @@
 *~
-.ipynb_checkpoints/
-.RData
-.rdb
-.rdx
+*.ipynb_checkpoints/
+*.RData
+*.rdb
+*.rdx
+*cache/
