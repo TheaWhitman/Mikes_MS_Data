@@ -1,5 +1,11 @@
+---
+title: "Using Phyloseq to Visualize QIIME Output from Cladophora Microbiota, 2014"
+author: "Michael Braus"
+date: "`r Sys.Date()`"
+output: html_document
+---
 ```{r global_options, include=FALSE}
-knitr::opts_chunk$set(fig.width=8, fig.height=6, fig.path='QIIME2Phyloseq-figs/', warning=FALSE, message=FALSE)
+knitr::opts_chunk$set(fig.width=8, fig.height=6, fig.path='QIIME2Phyloseq-figs/', warning=FALSE, message=FALSE, cache=TRUE)
 ```
 ```{r load_packages, results="hide"}
 setwd("~/Dropbox/clado-manuscript/Mikes_MS_Data/")
@@ -7,8 +13,11 @@ setwd("~/Dropbox/clado-manuscript/Mikes_MS_Data/")
 #biocLite('phyloseq')
 library(phyloseq)
 library(ggplot2)
+library(plyr)
 library(dplyr)
 library(Rmisc)
+library(DESeq2)
+library(doParallel)
 ```
 ``` {r load_data, results="hide"}
 # Load biom file. 
