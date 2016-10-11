@@ -20,3 +20,5 @@ Methylocapsa
 Methylocella
 Methylocystis
 Methylosinus
+Methylogaea
+Methylohalobius

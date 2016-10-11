@@ -5,7 +5,7 @@ date: "`r Sys.Date()`"
 output: html_document
 ---
 ```{r global_options, include=FALSE}
-knitr::opts_chunk$set(fig.width=8, fig.height=6, fig.path='QIIME2Phyloseq-figs/', warning=FALSE, message=FALSE, cache=TRUE)
+knitr::opts_chunk$set(fig.width=9, fig.height=7, fig.path='QIIME2Phyloseq-figs/', warning=FALSE, message=FALSE, cache=TRUE)
 ```
 ```{r load_packages, results="hide"}
 setwd("~/Dropbox/clado-manuscript/Mikes_MS_Data/")
@@ -33,7 +33,7 @@ sample_data(biom) <- sam.data
 biom; sample_data(biom)
 head(otu_table(biom))
 ```
-```{r plotting}
+```{r ordination}
 # Custom plotting. 
 nolegend <- theme(legend.position="none")
 readabund <- labs(y="read abundance")
@@ -44,17 +44,15 @@ ordNMDS.k3 <- ordinate(biom.relabund, method="NMDS", distance="bray", k=3)
 ord.k3 <- plot_ordination(biom.relabund, ordNMDS.k3, shape="Site", color = "DateSite") + geom_point(size=2) + geom_polygon(aes(fill=DateSite), alpha=0.7) + labs(title = "Cladophora, 2014") + theme_bw()
 ord.k3
 # Facet by Date. 
-ord.k3.facet1 <- plot_ordination(biom.relabund, ordNMDS.k3, shape="Site", label = "Date") + geom_point(size=2.5) + facet_wrap(~Date) + labs(title = "Cladophora, 2014") + geom_polygon(aes(fill=DateSite)) + theme_bw()
+ord.k3.facet1 <- plot_ordination(biom.relabund, ordNMDS.k3, shape="Site") + geom_point(size=2.5) + facet_wrap(~Date) + labs(title = "Cladophora, 2014") + theme_bw()
 ord.k3.facet1
 # Facet by Site. 
-ord.k3.facet2 <- plot_ordination(biom.relabund, ordNMDS.k3, label = "Date") + geom_point(size=2.5) + facet_wrap(~Site, ncol = 1) + labs(title = "Cladophora, 2014") + geom_polygon(aes(fill=DateSite)) + theme_bw()
+ord.k3.facet2 <- plot_ordination(biom.relabund, ordNMDS.k3, color = "Date") + geom_point(size=2.5) + facet_wrap(~Site, ncol = 1) + labs(title = "Cladophora, 2014") + theme_bw()
 ord.k3.facet2
-# ANOSIM...
-# Remove singleton. (EDA)
-biom.nosingle <- prune_taxa(taxa_sums(biom)>1, biom)
-biom.nosingle # Same, so QIIME QC covered it. 
+```
+```{r methanos}
 # Find methanotrophs
-methanolist <- read.table(file = "~/Dropbox/clado-manuscript/clado_16S-archive/methanos.txt")
+methanolist <- read.table(file = "methanos.txt")
 methanolist <- as.vector(methanolist$V1)
 # 
 biom.relabund.methanos <- subset_taxa(biom.relabund, Genus %in% as.factor(methanolist))
@@ -71,20 +69,43 @@ head(relabund.methanos.genus)
 p <- ggplot(relabund.methanos.genus, aes(as.factor(Date), GenusAbundance, color = Site))
 p <- p + geom_point() + facet_wrap(~Genus, scales="free_y")
 p
-
-# Means with error bars
-# stats <- summarySE(biom, measurevar="Abundance", groupvars=c("bacsp","media")); stats
-# p.stats <- ggplot(stats, aes(x = media, y = percloss, fill = bacsp))
-# p.stats + geom_bar(stat = "identity", position=position_dodge(.9)) + geom_errorbar(aes(ymin=percloss-se, ymax=percloss+se), width=.2, colour="darkblue", position=position_dodge(.9)) + geom_rug()  + scale_fill_grey()
-
-# Plot richness. 
-biom.rich <- plot_richness(biom, x="Date", color="Site")
-biom.rich
-
-### Shannon linear model test. 
-#biom.rich[1][1]
-
 # Stacked bar plots of methanotrophs. 
 barstack.methanos <- plot_bar(biom.relabund.methanos, x = "Date", fill="Site") + facet_wrap(~Genus, scales="free_y")
 barstack.methanos
+```
+```{r plot_relabund_methanos_summarySE, fig.width=9, fig.height=18}
+relabund.methanos.genus.est <- summarySE(relabund.methanos.genus, measurevar="GenusAbundance", groupvars=c("Site","Date", "Genus"))
+head(relabund.methanos.genus.est)
+relabund.methanos.genus.est$Date <- as.character(relabund.methanos.genus.est$Date)
+relabund.methanos.genus.est$Date <- as.numeric(relabund.methanos.genus.est$Date)
+p <- ggplot(relabund.methanos.genus.est, aes(x=Date, y=GenusAbundance)) + geom_point() +  geom_errorbar(aes(ymin=GenusAbundance-se, ymax=GenusAbundance+se)) +  geom_smooth(method="lm", se=TRUE) + facet_wrap(~Genus~Site, ncol = 3, scales="free_y")
+p + theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10))
+```
+```{r plot_richness_all}
+# https://joey711.github.io/phyloseq/plot_richness-examples.html
+# Plot richness. 
+biom.rich <- plot_richness(biom, x="Date", color="Site", measures=c("Observed", "Chao1", "Shannon"))
+biom.rich + geom_point(size=2, alpha=0.6)
+
+biom.est.rich <- estimate_richness(biom, measures = NULL)
+biom.est.rich$SampleID.1 <- row.names(biom.est.rich)
+biom.est.rich <- merge(biom.est.rich, sam.data, by = "SampleID.1")
+biom.est.rich$Date <- as.character(biom.est.rich$Date)
+biom.est.rich$Date <- as.numeric(biom.est.rich$Date)
+```
+```{r plot_richness_obs}
+biom.est.rich.obs <- summarySE(biom.est.rich, measurevar="Observed", groupvars=c("Date","Site"))
+str(biom.est.rich.obs)
+p.obs <- ggplot(biom.est.rich.obs, aes(x=Date, y=Observed)) + geom_point() +  geom_errorbar(aes(ymin=Observed-se, ymax=Observed+se)) + geom_smooth(method="lm",se=TRUE) + facet_grid(~ Site)
+p.obs + theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10))
+```
+```{r plot_richness_sha}
+biom.est.rich.sha <- summarySE(biom.est.rich, measurevar="Shannon", groupvars=c("Date","Site")); biom.est.rich.sha
+p.sha <- ggplot(biom.est.rich.sha, aes(x=Date, y=Shannon)) + geom_point() +  geom_errorbar(aes(ymin=Shannon-se, ymax=Shannon+se)) +  geom_smooth(method="lm",se=TRUE) + facet_grid(~ Site)
+p.sha + theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10))
+```
+```{r plot_richness_ch1}
+biom.est.rich.ch1 <- summarySE(biom.est.rich, measurevar="Chao1", groupvars=c("Date","Site")); biom.est.rich.ch1
+p.ch1 <- ggplot(biom.est.rich.ch1, aes(x=Date, y=Chao1)) + geom_point() +  geom_errorbar(aes(ymin=Chao1-se, ymax=Chao1+se)) +  geom_smooth(method="lm",se=TRUE) + facet_grid(~ Site)
+p.ch1 + theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10))
 ```
