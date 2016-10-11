@@ -48,9 +48,7 @@ variables
 ```{r make_Dif_Abund}
 # We are creating a function called Dif_Abund that will run deseq on each subset of factors (day and Site), 
 # and return the factors, OTU ID, base mean, log2-fold change, the SE, and the p value associated with the response.
-
 # This is testing for the question, on each date, are there differences between sample sites?
-
 Dif_Abund = function(Site,Date){
   biom.pruned = prune_samples(sample_data(biom)$Date == paste(Date),biom)
   biom.pruned = prune_samples((sample_data(biom.pruned)$Site == paste(Site) | sample_data(biom.pruned)$Site == "Point"),biom.pruned)
@@ -106,7 +104,6 @@ range = seq(0,3,0.25)
 # Creates a sequence of numbers we are interested in for adjusted p values (from 0-3 by 0.25 increments)
 thresh.s <- ldply(range, threshold)
 # Applys the Threshold function we created above to the range of numbers we created above.
-
 plot(thresh.s$count~thresh.s$cutoff)
 # We can plot the threshold for base Mean value against the number of samples that will pass under this cutoff.
 # We can see the optimum value to use here (here, 1.5)
@@ -127,7 +124,6 @@ dim(l2fc[is.na(l2fc$padj)==TRUE,])[1]/dim(l2fc[])[1]
 ```{r cutoff}
 cutoff = 1
 FDR = 0.1
-
 d = l2fc %>%
   group_by(Site,Date)%>%
   mutate(Sig = ifelse(padj<FDR&l2FC>=cutoff,1,0))%>%
@@ -143,7 +139,6 @@ d
 ```{r logfold_change}
 FDR = 0.1
 d = l2fc
-
 d = group_by(d, Site,Date) %>%
   mutate(sig = ifelse(padj<FDR,1,0))%>%
   mutate(Total=sum(baseMean)) %>%
@@ -152,7 +147,6 @@ d = group_by(d, Site,Date) %>%
 # Creates a column designating whether (1) or not (0) the padj is lower than our false discovery rate (set above)
 # We also calculate a new relative abundance value using the average across samples
 # and we cut out those rows with no p-values
-
 PhylumFraction = 0.005
 OTUFraction = 0.001
 PhylumList = d %>%
@@ -163,62 +157,41 @@ PhylumList = levels(droplevels(PhylumList$Phylum))
 # greater than the cutoff (PhylumFraction, defined above), OR if the single OTU makes up a large enough fraciton
 # of the total community on its own (OTUFraction, defined above)
 # Thus, we have selected the phyla we want to plot.
-
 d = filter(d, Phylum %in% PhylumList)
-
 max.l2FC = ddply(d, .(Phylum), summarize, M = max(l2FC))
 d$Phylum = factor(d$Phylum, max.l2FC[order(-max.l2FC$M),]$Phylum)
 # makes a dataframe with the maximum value of log2Fold change for each phylum
 # takes our phylum column, and arranges it in order of our log2FoldChange values
-
 d$sig = as.factor(d$sig)
 d.yes = d[d$sig==1,]
 d.no = d[d$sig==0,]
 # Creates new columns (true/false) for whether it is significant or not
 ```
-```{r plot_logfold_change}
+```{r plot_logfold_change, fig.height=20}
 p = ggplot(d)
 p = p + geom_point(data=d.yes, aes(x = Phylum, y = l2FC, fill = Phylum, size=relabund), shape = 21, alpha=0.4, position = position_jitter(w = 0.20))
 # p = p + geom_point(data=d.no, aes(x = Date, y = l2FC, fill = sig, size=relabund), shape = 21, alpha=0.3, position = position_jitter(w = 0.20))
 # Plotting the significant and the nonsignificant points differently
 # size is proportional to relative abundance, and we colour it by Class
-
 p = p + scale_size_continuous("log(Relative\nAbundance)",trans="log",guide="none")
 # Transforming the size of the points so it's better visualized
-
 p = p + facet_grid(Date~Site, scales="free_x")
 # Saying we want it to present the data separately for each phylum
-
 p = p + geom_hline(yintercept = 1, linetype=2)
 p = p + geom_hline(yintercept = -1, linetype=2)
 p = p + geom_hline(yintercept = 3.3219, linetype=3)
 p = p + geom_hline(yintercept = -3.3219, linetype=3)
 p = p + geom_hline(yintercept = 0.0, linetype=1)
 # Puts in horizontal lines at reference values
-
 p = p + theme_bw()
 # Sets a theme
-
-p = p + theme(strip.text.x = element_text(size = 16),
-              strip.text.y = element_text(size = 16),
-              axis.text.x = element_text(size = 14, angle = 45, hjust = 1, vjust = 1, face="italic"),
-              axis.title.x = element_text(size = 18),
-              axis.text.y = element_text(size=16),
-              axis.title.y = element_text(size = 18),
-              legend.title = element_text(size=18),
-              legend.text = element_text(size = 14),
-              #legend.position = "none",
-              strip.background = element_blank(),
-              panel.grid.major = element_blank(),
-              panel.grid.minor = element_blank())
+p = p + theme(strip.text.x = element_text(size = 16), strip.text.y = element_text(size = 16), axis.text.x = element_text(size = 14, angle = 45, hjust = 1, vjust = 1, face="italic"), axis.title.x = element_text(size = 18), axis.text.y = element_text(size=16), axis.title.y = element_text(size = 18), legend.title = element_text(size=18), legend.text = element_text(size = 14), strip.background = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 # sets a bunch of visual paramters for the legend (none) and other text
-
 p = p + labs(y = expression(paste("", log[2]," fold change vs. Point site",sep="")))
 # sets the label for the y axes.
-
 p
 ```
-```{r plot_logfold_change_proteobac}
+```{r plot_logfold_change_proteobac, fig.height=20}
 dProteo = d %>%
   filter(Phylum=="Proteobacteria")
 d.yesProteo = d.yes %>%
@@ -226,28 +199,22 @@ d.yesProteo = d.yes %>%
 d.noProteo = d.no %>%
   filter(Phylum=="Proteobacteria")
 # Subsetting our data for Proteos
-
 p = ggplot(dProteo)
 p = p + geom_point(data=d.yesProteo, aes(x = Order, y = l2FC, fill = Order, size=relabund), shape = 21, alpha=0.4, position = position_jitter(w = 0.20))
 # p = p + geom_point(data=d.noProteo, aes(x = Date, y = l2FC, fill = sig, size=relabund), shape = 21, alpha=0.3, position = position_jitter(w = 0.20))
 # Plotting the significant and the nonsignificant points differently
 # size is proportional to relative abundance, and we colour it by Class
-
 p = p + scale_size_continuous("log(Relative\nAbundance)",trans="log",guide="none")
 # Transforming the size of the points so it's better visualized
-
 p = p + facet_grid(Date~Site~Class, scales="free_x")
 # Saying we want it to present the data separately for each phylum
-
 p = p + geom_hline(yintercept = 1, linetype=2)
 p = p + geom_hline(yintercept = -1, linetype=2)
 p = p + geom_hline(yintercept = 3.3219, linetype=3)
 p = p + geom_hline(yintercept = -3.3219, linetype=3)
 p = p + geom_hline(yintercept = 0.0, linetype=1)
 # Puts in horizontal lines at reference values
-
 p = p + theme_bw()
-
 p = p + theme(strip.text.x = element_text(size = 16),
               strip.text.y = element_text(size = 16),
               axis.text.x = element_text(size = 14, angle = 45, hjust = 1, vjust = 1, face="italic"),
@@ -261,42 +228,34 @@ p = p + theme(strip.text.x = element_text(size = 16),
               panel.grid.major = element_blank(),
               panel.grid.minor = element_blank())
 # sets a bunch of visual paramters for the legend (none) and other text
-
 p = p + labs(y = expression(paste("", log[2]," fold change vs. Point site",sep="")))
 # sets the label for the y axes.
-
 p + theme(legend.position="none")
 ```
-```{r plot_logfold_change_bacteriodetes}
+```{r plot_logfold_change_bacteriodetes, fig.height=20}
 dBacter = d %>%
   filter(Phylum=="Bacteroidetes")
 d.yesBacter = d.yes %>%
   filter(Phylum=="Bacteroidetes")
 d.noBacter = d.no %>%
   filter(Phylum=="Bacteroidetes")
-
 p = ggplot(dBacter)
 p = p + geom_point(data=d.yesBacter, aes(x = Class, y = l2FC, fill = Class, size=relabund), shape = 21, alpha=0.4, position = position_jitter(w = 0.20))
 #p = p + geom_point(data=d.noBacter, aes(x = Class, y = l2FC, fill = Class, size=relabund), shape = 21, alpha=0.3, position = position_jitter(w = 0.20))
 # Plotting the significant and the nonsignificant points differently
 # size is proportional to relative abundance, and we colour it by Class
-
 p = p + scale_size_continuous("log(Relative\nAbundance)",trans="log",guide="none")
 # Transforming the size of the points so it's better visualized
-
 p = p + facet_grid(Date~Site, scales="free_x")
 # Saying we want it to present the data separately for each phylum
-
 p = p + geom_hline(yintercept = 1, linetype=2)
 p = p + geom_hline(yintercept = -1, linetype=2)
 p = p + geom_hline(yintercept = 3.3219, linetype=3)
 p = p + geom_hline(yintercept = -3.3219, linetype=3)
 p = p + geom_hline(yintercept = 0.0, linetype=1)
 # Puts in horizontal lines at reference values
-
 p = p + theme_bw()
 # Sets a theme
-
 p = p + theme(strip.text.x = element_text(size = 16),
               strip.text.y = element_text(size = 16),
               axis.text.x = element_text(size = 14, angle = 45, hjust = 1, vjust = 1, face="italic"),
@@ -310,10 +269,8 @@ p = p + theme(strip.text.x = element_text(size = 16),
               panel.grid.major = element_blank(),
               panel.grid.minor = element_blank())
 # sets a bunch of visual paramters for the legend (none) and other text
-
 p = p + labs(y = expression(paste("", log[2]," fold change vs. Point site",sep="")))
 # sets the label for the y axes.
-
 p + theme(legend.position="none")
 ```
 ```{r methanotrophs}
@@ -332,33 +289,26 @@ df = group_by(df, Site,Date) %>%
 # Creates a column designating whether (1) or not (0) the padj is lower than our false discovery rate (set above)
 # We also calculate a new relative abundance value using the average across samples
 # and we cut out those rows with no p-values
-
 df$sig = as.factor(df$sig)
 df.yes = df[df$sig==1,]
 df.no = df[df$sig==0,]
 # Creates new columns (true/false) for whether it is significant or not
 p = ggplot(df)
-
 p = p + geom_point(data=df.yes, aes(x = Date, y = l2FC, fill = Site, size=relabund), shape = 21, alpha=0.4, position = position_jitter(w = 0.20))
 p = p + geom_point(data=df.no, aes(x = Date, y = l2FC, fill = sig, size=relabund), shape = 21, alpha=0.3, position = position_jitter(w = 0.20))
 # Plotting the significant and the nonsignificant points differently
 # size is proportional to relative abundance, and we colour it by Class
-
 p = p + scale_size_continuous("log(Relative\nAbundance)",trans="log",guide="none")
 # Transforming the size of the points so it's better visualized
-
 p = p + facet_grid(~Genus, scales="free_x")
 # Saying we want it to present the data separately for each phylum
-
 p = p + geom_hline(yintercept = 1, linetype=2)
 p = p + geom_hline(yintercept = -1, linetype=2)
 p = p + geom_hline(yintercept = 3.3219, linetype=3)
 p = p + geom_hline(yintercept = -3.3219, linetype=3)
 p = p + geom_hline(yintercept = 0.0, linetype=1)
 # Puts in horizontal lines at reference values
-
 p = p + theme_bw()
-
 p = p + theme(strip.text.x = element_text(size = 16),
               strip.text.y = element_text(size = 16),
               axis.text.x = element_text(size = 14, angle = 45, hjust = 1, vjust = 1, face="italic"),
@@ -372,19 +322,15 @@ p = p + theme(strip.text.x = element_text(size = 16),
               panel.grid.major = element_blank(),
               panel.grid.minor = element_blank())
 # sets a bunch of visual paramters for the legend (none) and other text
-
 p = p + labs(y = expression(paste("", log[2]," fold change vs. Point site",sep="")))
 # sets the label for the y axes
-
 p
 ```
 ```{r plot_phylum_abundance}
 mdf = psmelt(biom)
 #"melting" the phyloseq data into a dataframe
-
 # We want to calculate the total relative abundance of each phylum
 # and then take the top X most abundant phyla
-
 SortedPhyla = mdf %>%
   group_by(Sample,Phylum) %>%
   summarize(PhyAbund = sum(Abundance))%>%
@@ -407,27 +353,18 @@ mdf2 = mdf2 %>%
   group_by(Sample,Site,Date,Phylum) %>%
   summarize(PhyAbund = sum(Abundance))
 p = ggplot(mdf2, aes(Date, PhyAbund, fill = Date))
-
 p = p + geom_boxplot()
-
 p = p + facet_wrap(~Phylum, scales = "free_y")
-
 #p = p + scale_fill_manual(values=c("orange","gold1","red3"))
-
 p = p + theme_bw()
-
 p = p + guides(fill = "none")
 p = p + theme(legend.position = "none")
-
 p = p + theme(strip.text.x = element_text(size=11), 
               strip.text.y = element_text(size=9), 
               strip.background = element_rect(colour="white", fill="white"))
-
 p = p + theme(axis.text.x = element_text(size = 9, angle = 45, hjust=1),axis.text.y = element_text(size = 9))
 p = p + theme(axis.title.x = element_blank())
 p = p + theme(axis.title.y = element_text(size = 15, vjust = 1))
-
 p = p + labs(x="Amendment",y="Relative abundance")
-
 p
 ```

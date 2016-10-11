@@ -9,15 +9,15 @@ knitr::opts_chunk$set(fig.width=9, fig.height=7, fig.path='QIIME2Phyloseq-figs/'
 ```
 ```{r load_packages, results="hide"}
 setwd("~/Dropbox/clado-manuscript/Mikes_MS_Data/")
-#source('http://bioconductor.org/biocLite.R')
-#biocLite('phyloseq')
-library(phyloseq)
 library(ggplot2)
 library(plyr)
 library(dplyr)
 library(Rmisc)
 library(DESeq2)
 library(doParallel)
+#source('http://bioconductor.org/biocLite.R')
+#biocLite('phyloseq')
+library(phyloseq)
 ```
 ``` {r load_data, results="hide"}
 # Load biom file. 
@@ -39,16 +39,20 @@ nolegend <- theme(legend.position="none")
 readabund <- labs(y="read abundance")
 # Normalize by relative abundance. 
 biom.relabund <- transform_sample_counts(biom, function(x) x / sum(x))
+# Ordination plot. 
 ordNMDS <- ordinate(biom.relabund, method="NMDS", distance="bray")
 ordNMDS.k3 <- ordinate(biom.relabund, method="NMDS", distance="bray", k=3)
-ord.k3 <- plot_ordination(biom.relabund, ordNMDS.k3, shape="Site", color = "DateSite") + geom_point(size=2) + geom_polygon(aes(fill=DateSite), alpha=0.7) + labs(title = "Cladophora, 2014") + theme_bw()
-ord.k3
+ord.k3 <- plot_ordination(biom.relabund, ordNMDS.k3, shape="Site", color = "DateSite") + geom_point(size=3) + geom_polygon(aes(fill=DateSite), alpha=0.7)
+ord.k3 + labs(title = "Cladophora, 2014") + theme_bw()
+# Ordination plot in black and white. 
+ord.k3.bw <- plot_ordination(biom.relabund, ordNMDS.k3, shape="Site", label = "Date") + geom_point(size=2) + geom_polygon(colour="black", size=0.25, fill="white", alpha = 0.2, aes(group=DateSite))
+ord.k3.bw + labs(title = "Cladophora, 2014") + theme_bw()
 # Facet by Date. 
-ord.k3.facet1 <- plot_ordination(biom.relabund, ordNMDS.k3, shape="Site") + geom_point(size=2.5) + facet_wrap(~Date) + labs(title = "Cladophora, 2014") + theme_bw()
-ord.k3.facet1
+ord.k3.facet1 <- plot_ordination(biom.relabund, ordNMDS.k3, shape="Site") + geom_point(size=2.5) + facet_wrap(~Date) + geom_polygon(colour="black", size=0.25, fill="white", alpha = 0.2, aes(group=DateSite))
+ord.k3.facet1 + labs(title = "Cladophora, 2014") + theme_bw()
 # Facet by Site. 
-ord.k3.facet2 <- plot_ordination(biom.relabund, ordNMDS.k3, color = "Date") + geom_point(size=2.5) + facet_wrap(~Site, ncol = 1) + labs(title = "Cladophora, 2014") + theme_bw()
-ord.k3.facet2
+ord.k3.facet2 <- plot_ordination(biom.relabund, ordNMDS.k3, color = "Date") + geom_point(size=2.5) + facet_wrap(~Site, ncol = 1) + geom_polygon(colour="black", size=0.25, fill="white", alpha = 0.2, aes(group=DateSite))
+ord.k3.facet2 + labs(title = "Cladophora, 2014") + theme_bw()
 ```
 ```{r methanos}
 # Find methanotrophs
@@ -108,4 +112,20 @@ p.sha + theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hju
 biom.est.rich.ch1 <- summarySE(biom.est.rich, measurevar="Chao1", groupvars=c("Date","Site")); biom.est.rich.ch1
 p.ch1 <- ggplot(biom.est.rich.ch1, aes(x=Date, y=Chao1)) + geom_point() +  geom_errorbar(aes(ymin=Chao1-se, ymax=Chao1+se)) +  geom_smooth(method="lm",se=TRUE) + facet_grid(~ Site)
 p.ch1 + theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10))
+```
+```{r anosim}
+library("vegan"); packageVersion("vegan")
+# Anosim by site. 
+site_group = get_variable(biom, "Site")
+site_ano = anosim(phyloseq::distance(biom, "bray"), site_group)
+site_ano
+# Anosim by date. 
+date_group = get_variable(biom, "Date")
+date_ano = anosim(phyloseq::distance(biom, "bray"), date_group)
+date_ano
+# 
+df = as(sample_data(biom), "data.frame")
+d = phyloseq::distance(biom, "bray")
+clado.adonis = adonis(d ~ Date + Site + Date*Site, df)
+clado.adonis
 ```
