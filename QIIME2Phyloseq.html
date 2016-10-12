@@ -359,8 +359,8 @@ biom; sample_data(biom)</code></pre>
 nolegend &lt;- theme(legend.position=&quot;none&quot;)
 readabund &lt;- labs(y=&quot;read abundance&quot;)
 # Normalize by relative abundance. 
-biom.relabund &lt;- transform_sample_counts(biom, function(x) x / sum(x))
-# Ordination plot. 
+biom.relabund &lt;- transform_sample_counts(biom, function(x) x / sum(x))</code></pre>
+<pre class="r"><code># Ordination plot. 
 ordNMDS &lt;- ordinate(biom.relabund, method=&quot;NMDS&quot;, distance=&quot;bray&quot;)</code></pre>
 <pre><code>## Run 0 stress 0.1164511 
 ## Run 1 stress 0.1164499 

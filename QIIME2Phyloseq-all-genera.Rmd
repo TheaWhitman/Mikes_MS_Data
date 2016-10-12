@@ -1,0 +1,69 @@
+---
+title: "Plotting ALL GENERA from Cladophora Microbiota, 2014"
+author: "Michael Braus"
+date: "`r Sys.Date()`"
+output: html_document
+---
+  ```{r global_options, include=FALSE}
+knitr::opts_chunk$set(fig.width=9, fig.height=7, fig.path='QIIME2Phyloseq-all-genera-figs/', warning=FALSE, message=FALSE, cache=TRUE)
+```
+```{r load_packages, results="hide"}
+setwd("~/Dropbox/clado-manuscript/Mikes_MS_Data/")
+library(ggplot2)
+library(plyr)
+library(dplyr)
+library(Rmisc)
+library(DESeq2)
+library(doParallel)
+#source('http://bioconductor.org/biocLite.R')
+#biocLite('phyloseq')
+library(phyloseq)
+```
+``` {r load_data, results="hide"}
+# Load biom file. 
+biom <- import_biom("OTU_table.biom", "~/Dropbox/clado-manuscript/Nephele/PipelineResults_NMEPINZ20QK1/nephele_outputs/tree.tre", parseFunction=parse_taxonomy_greengenes)
+```
+``` {r merge_metadata}
+sam.data <- read.csv(file="sample.data.csv", row.names=1, header=TRUE)
+head(sam.data)
+sam.data$Date <- as.factor(sam.data$Date)
+sam.data$DateSite <- paste(sam.data$Date, sam.data$Site)
+head(sam.data); str(sam.data)
+sample_data(biom) <- sam.data
+biom; sample_data(biom)
+head(otu_table(biom))
+# Custom plotting. 
+nolegend <- theme(legend.position="none")
+readabund <- labs(y="read abundance")
+# Normalize by relative abundance. 
+biom.relabund <- transform_sample_counts(biom, function(x) x / sum(x))
+```
+```{r all_genera, fig.height=600}
+# Make a list of all genera identified. 
+genera.relabund <- sort(get_taxa_unique(biom.relabund, "Genus"), decreasing=FALSE)
+write(genera.relabund, file = "genera-relabund.txt")
+# Find all genera
+all.genera <- read.table(file = "genera-relabund.txt")
+all.genera <- as.vector(all.genera$V1)
+# 
+biom.relabund.all.genera <- subset_taxa(biom.relabund, Genus %in% as.factor(all.genera))
+biom.relabund.all.genera
+biom.relabund.all.genera <- psmelt(biom.relabund.all.genera)
+biom.relabund.all.genera.genus <- biom.relabund.all.genera%>%
+  group_by(Sample, Genus)%>%
+  mutate(GenusAbundance = sum(Abundance))%>%
+  distinct(Sample, GenusAbundance, TreatmentGroup, Site, Date, Family, Genus)
+head(biom.relabund.all.genera.genus)
+# Not working: 
+# p <- ggplot(biom.relabund.all.genera.genus, aes(as.factor(Date), GenusAbundance, color = Site))
+# p <- p + geom_point() + facet_wrap(~Genus, scales="free_y")
+# p
+```
+```{r plot_all_genera_summarySE, fig.height=600}
+biom.relabund.all.genera.genus.est <- summarySE(biom.relabund.all.genera.genus, measurevar="GenusAbundance", groupvars=c("Site","Date", "Genus"))
+head(biom.relabund.all.genera.genus.est)
+biom.relabund.all.genera.genus.est$Date <- as.character(biom.relabund.all.genera.genus.est$Date)
+biom.relabund.all.genera.genus.est$Date <- as.numeric(biom.relabund.all.genera.genus.est$Date)
+p <- ggplot(biom.relabund.all.genera.genus.est, aes(x=Date, y=GenusAbundance)) + geom_point() +  geom_errorbar(aes(ymin=GenusAbundance-se, ymax=GenusAbundance+se)) +  geom_smooth(method="lm", se=TRUE) + facet_wrap(~Genus~Site, ncol = 3, scales="free_y")
+p + theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10))
+```

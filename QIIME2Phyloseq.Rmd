@@ -32,13 +32,13 @@ head(sam.data); str(sam.data)
 sample_data(biom) <- sam.data
 biom; sample_data(biom)
 head(otu_table(biom))
-```
-```{r ordination}
 # Custom plotting. 
 nolegend <- theme(legend.position="none")
 readabund <- labs(y="read abundance")
 # Normalize by relative abundance. 
 biom.relabund <- transform_sample_counts(biom, function(x) x / sum(x))
+```
+```{r ordination}
 # Ordination plot. 
 ordNMDS <- ordinate(biom.relabund, method="NMDS", distance="bray")
 ordNMDS.k3 <- ordinate(biom.relabund, method="NMDS", distance="bray", k=3)
