@@ -77,7 +77,7 @@ p
 barstack.methanos <- plot_bar(biom.relabund.methanos, x = "Date", fill="Site") + facet_wrap(~Genus, scales="free_y")
 barstack.methanos
 ```
-```{r plot_relabund_methanos_summarySE, fig.width=9, fig.height=18}
+```{r methanos_summarySE, fig.width=9, fig.height=18}
 relabund.methanos.genus.est <- summarySE(relabund.methanos.genus, measurevar="GenusAbundance", groupvars=c("Site","Date", "Genus"))
 head(relabund.methanos.genus.est)
 relabund.methanos.genus.est$Date <- as.character(relabund.methanos.genus.est$Date)
@@ -128,4 +128,29 @@ df = as(sample_data(biom), "data.frame")
 d = phyloseq::distance(biom, "bray")
 clado.adonis = adonis(d ~ Date + Site + Date*Site, df)
 clado.adonis
+```
+```{r top_25_genera, fig.height=50}
+top.genera = sort(tapply(taxa_sums(biom.relabund), tax_table(biom.relabund)[, "Genus"], sum), TRUE)
+top.genera = top.genera[1:25]
+# Prune to just the most-abundant genera. 
+biom.relabund.subset = subset_taxa(biom.relabund, Genus %in% names(top.genera))
+get_taxa_unique(biom.relabund.subset, "Genus")
+# Find top phyla. 
+top.genera.list <- as.vector(names(top.genera))
+biom.relabund.subset.taxa <- subset_taxa(biom.relabund.subset, Genus %in% as.factor(top.genera.list))
+biom.relabund.subset.taxa
+head(tax_table(biom.relabund.subset.taxa))
+relabund.top.genera <- psmelt(biom.relabund.subset.taxa)
+relabund.top.genera.genus <- relabund.top.genera%>%
+  group_by(Sample, Genus)%>%
+  mutate(GenusAbundance = sum(Abundance))%>%
+  distinct(Sample, GenusAbundance, TreatmentGroup, Site, Date, Family, Genus)
+head(relabund.top.genera.genus)
+# Plot. 
+relabund.top.genera.genus.est <- summarySE(relabund.top.genera.genus, measurevar="GenusAbundance", groupvars=c("Site","Date", "Genus"))
+head(relabund.top.genera.genus.est)
+relabund.top.genera.genus.est$Date <- as.character(relabund.top.genera.genus.est$Date)
+relabund.top.genera.genus.est$Date <- as.numeric(relabund.top.genera.genus.est$Date)
+p <- ggplot(relabund.top.genera.genus.est, aes(x=Date, y=GenusAbundance)) + geom_point() +  geom_errorbar(aes(ymin=GenusAbundance-se, ymax=GenusAbundance+se)) +  geom_smooth(method="lm", se=TRUE) + facet_wrap(~Genus~Site, ncol = 3, scales="free_y")
+p + theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10))
 ```
