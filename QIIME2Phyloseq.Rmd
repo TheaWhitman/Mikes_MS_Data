@@ -47,6 +47,8 @@ ord.k3 + labs(title = "Cladophora, 2014") + theme_bw()
 # Ordination plot in black and white. 
 ord.k3.bw <- plot_ordination(biom.relabund, ordNMDS.k3, shape="Site", label = "Date") + geom_point(size=2) + geom_polygon(colour="black", size=0.25, fill="white", alpha = 0.2, aes(group=DateSite))
 ord.k3.bw + labs(title = "Cladophora, 2014") + theme_bw()
+```
+```{r ordination_facets, fig.width=6}
 # Facet by Date. 
 ord.k3.facet1 <- plot_ordination(biom.relabund, ordNMDS.k3, shape="Site") + geom_point(size=2.5) + facet_wrap(~Date) + geom_polygon(colour="black", size=0.25, fill="white", alpha = 0.2, aes(group=DateSite))
 ord.k3.facet1 + labs(title = "Cladophora, 2014") + theme_bw()
@@ -153,4 +155,7 @@ relabund.top.genera.genus.est$Date <- as.character(relabund.top.genera.genus.est
 relabund.top.genera.genus.est$Date <- as.numeric(relabund.top.genera.genus.est$Date)
 p <- ggplot(relabund.top.genera.genus.est, aes(x=Date, y=GenusAbundance)) + geom_point() +  geom_errorbar(aes(ymin=GenusAbundance-se, ymax=GenusAbundance+se)) +  geom_smooth(method="lm", se=TRUE) + facet_wrap(~Genus~Site, ncol = 3, scales="free_y")
 p + theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10))
+```
+```{r 16S_copy_number}
+
 ```
