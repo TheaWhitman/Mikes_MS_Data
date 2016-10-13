@@ -99,20 +99,16 @@ biom.est.rich <- merge(biom.est.rich, sam.data, by = "SampleID.1")
 biom.est.rich$Date <- as.character(biom.est.rich$Date)
 biom.est.rich$Date <- as.numeric(biom.est.rich$Date)
 ```
-```{r plot_richness_obs}
+```{r plot_richness_metrics, fig.height=6}
 biom.est.rich.obs <- summarySE(biom.est.rich, measurevar="Observed", groupvars=c("Date","Site"))
 str(biom.est.rich.obs)
-p.obs <- ggplot(biom.est.rich.obs, aes(x=Date, y=Observed)) + geom_point() +  geom_errorbar(aes(ymin=Observed-se, ymax=Observed+se)) + geom_smooth(method="lm",se=TRUE) + facet_grid(~ Site)
+p.obs <- ggplot(biom.est.rich.obs, aes(x=Date, y=Observed, color = Site)) + geom_point() +  geom_errorbar(aes(ymin=Observed-se, ymax=Observed+se)) + geom_line()
 p.obs + theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10))
-```
-```{r plot_richness_sha}
 biom.est.rich.sha <- summarySE(biom.est.rich, measurevar="Shannon", groupvars=c("Date","Site")); biom.est.rich.sha
-p.sha <- ggplot(biom.est.rich.sha, aes(x=Date, y=Shannon)) + geom_point() +  geom_errorbar(aes(ymin=Shannon-se, ymax=Shannon+se)) +  geom_smooth(method="lm",se=TRUE) + facet_grid(~ Site)
+p.sha <- ggplot(biom.est.rich.sha, aes(x=Date, y=Shannon, color = Site)) + geom_point() +  geom_errorbar(aes(ymin=Shannon-se, ymax=Shannon+se)) +  geom_line()
 p.sha + theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10))
-```
-```{r plot_richness_ch1}
 biom.est.rich.ch1 <- summarySE(biom.est.rich, measurevar="Chao1", groupvars=c("Date","Site")); biom.est.rich.ch1
-p.ch1 <- ggplot(biom.est.rich.ch1, aes(x=Date, y=Chao1)) + geom_point() +  geom_errorbar(aes(ymin=Chao1-se, ymax=Chao1+se)) +  geom_smooth(method="lm",se=TRUE) + facet_grid(~ Site)
+p.ch1 <- ggplot(biom.est.rich.ch1, aes(x=Date, y=Chao1, color = Site)) + geom_point() +  geom_errorbar(aes(ymin=Chao1-se, ymax=Chao1+se)) +  geom_line()
 p.ch1 + theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10))
 ```
 ```{r anosim}
