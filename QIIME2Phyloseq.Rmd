@@ -38,7 +38,7 @@ readabund <- labs(y="read abundance")
 # Normalize by relative abundance. 
 biom.relabund <- transform_sample_counts(biom, function(x) x / sum(x))
 ```
-```{r ordination}
+```{r ordination, fig.width=5, fig.height=4}
 # Ordination plot. 
 ordNMDS <- ordinate(biom.relabund, method="NMDS", distance="bray")
 ordNMDS.k3 <- ordinate(biom.relabund, method="NMDS", distance="bray", k=3)
@@ -99,7 +99,7 @@ biom.est.rich <- merge(biom.est.rich, sam.data, by = "SampleID.1")
 biom.est.rich$Date <- as.character(biom.est.rich$Date)
 biom.est.rich$Date <- as.numeric(biom.est.rich$Date)
 ```
-```{r plot_richness_metrics, fig.height=6}
+```{r plot_richness_metrics, fig.height=3, fig.width=4}
 biom.est.rich.obs <- summarySE(biom.est.rich, measurevar="Observed", groupvars=c("Date","Site"))
 str(biom.est.rich.obs)
 p.obs <- ggplot(biom.est.rich.obs, aes(x=Date, y=Observed, color = Site)) + geom_point() +  geom_errorbar(aes(ymin=Observed-se, ymax=Observed+se)) + geom_line()
