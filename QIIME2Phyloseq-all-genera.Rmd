@@ -59,11 +59,11 @@ head(biom.relabund.all.genera.genus)
 # p <- p + geom_point() + facet_wrap(~Genus, scales="free_y")
 # p
 ```
-```{r plot_all_genera_summarySE, fig.height=600}
+```{r plot_all_genera_summarySE, fig.height=250}
 biom.relabund.all.genera.genus.est <- summarySE(biom.relabund.all.genera.genus, measurevar="GenusAbundance", groupvars=c("Site","Date", "Genus"))
 head(biom.relabund.all.genera.genus.est)
 biom.relabund.all.genera.genus.est$Date <- as.character(biom.relabund.all.genera.genus.est$Date)
 biom.relabund.all.genera.genus.est$Date <- as.numeric(biom.relabund.all.genera.genus.est$Date)
-p <- ggplot(biom.relabund.all.genera.genus.est, aes(x=Date, y=GenusAbundance)) + geom_point() +  geom_errorbar(aes(ymin=GenusAbundance-se, ymax=GenusAbundance+se)) +  geom_smooth(method="lm", se=TRUE) + facet_wrap(~Genus~Site, ncol = 3, scales="free_y")
+p <- ggplot(biom.relabund.all.genera.genus.est, aes(x=Date, y=GenusAbundance, color = Site)) + geom_point() +  geom_errorbar(aes(ymin=GenusAbundance-se, ymax=GenusAbundance+se)) +  geom_line() + facet_wrap(~Genus, ncol = 3, scales="free_y")
 p + theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10))
 ```
