@@ -79,12 +79,12 @@ p
 barstack.methanos <- plot_bar(biom.relabund.methanos, x = "Date", fill="Site") + facet_wrap(~Genus, scales="free_y")
 barstack.methanos
 ```
-```{r methanos_summarySE, fig.width=9, fig.height=18}
+```{r methanos_summarySE, fig.height=5}
 relabund.methanos.genus.est <- summarySE(relabund.methanos.genus, measurevar="GenusAbundance", groupvars=c("Site","Date", "Genus"))
 head(relabund.methanos.genus.est)
 relabund.methanos.genus.est$Date <- as.character(relabund.methanos.genus.est$Date)
 relabund.methanos.genus.est$Date <- as.numeric(relabund.methanos.genus.est$Date)
-p <- ggplot(relabund.methanos.genus.est, aes(x=Date, y=GenusAbundance)) + geom_point() +  geom_errorbar(aes(ymin=GenusAbundance-se, ymax=GenusAbundance+se)) +  geom_smooth(method="lm", se=TRUE) + facet_wrap(~Genus~Site, ncol = 3, scales="free_y")
+p <- ggplot(relabund.methanos.genus.est, aes(x=Date, y=GenusAbundance, color = Site)) + geom_point() +  geom_errorbar(aes(ymin=GenusAbundance-se, ymax=GenusAbundance+se)) +  geom_line() + facet_wrap(~Genus, ncol = 3, scales="free_y")
 p + theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10))
 ```
 ```{r plot_richness_all}
@@ -131,9 +131,9 @@ d = phyloseq::distance(biom, "bray")
 clado.adonis = adonis(d ~ Date + Site + Date*Site, df)
 clado.adonis
 ```
-```{r top_25_genera, fig.height=50}
+```{r top_30_genera, fig.height=20}
 top.genera = sort(tapply(taxa_sums(biom.relabund), tax_table(biom.relabund)[, "Genus"], sum), TRUE)
-top.genera = top.genera[1:25]
+top.genera = top.genera[1:30]
 # Prune to just the most-abundant genera. 
 biom.relabund.subset = subset_taxa(biom.relabund, Genus %in% names(top.genera))
 get_taxa_unique(biom.relabund.subset, "Genus")
@@ -153,9 +153,6 @@ relabund.top.genera.genus.est <- summarySE(relabund.top.genera.genus, measurevar
 head(relabund.top.genera.genus.est)
 relabund.top.genera.genus.est$Date <- as.character(relabund.top.genera.genus.est$Date)
 relabund.top.genera.genus.est$Date <- as.numeric(relabund.top.genera.genus.est$Date)
-p <- ggplot(relabund.top.genera.genus.est, aes(x=Date, y=GenusAbundance)) + geom_point() +  geom_errorbar(aes(ymin=GenusAbundance-se, ymax=GenusAbundance+se)) +  geom_smooth(method="lm", se=TRUE) + facet_wrap(~Genus~Site, ncol = 3, scales="free_y")
+p <- ggplot(relabund.top.genera.genus.est, aes(x=Date, y=GenusAbundance, color = Site)) + geom_point() +  geom_errorbar(aes(ymin=GenusAbundance-se, ymax=GenusAbundance+se)) +  geom_line() + facet_wrap(~Genus, ncol = 3, scales="free_y")
 p + theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10))
-```
-```{r 16S_copy_number}
-
 ```
