@@ -67,3 +67,19 @@ biom.relabund.all.genera.genus.est$Date <- as.numeric(biom.relabund.all.genera.g
 p <- ggplot(biom.relabund.all.genera.genus.est, aes(x=Date, y=GenusAbundance, color = Site)) + geom_point() +  geom_errorbar(aes(ymin=GenusAbundance-se, ymax=GenusAbundance+se)) +  geom_line() + facet_wrap(~Genus, ncol = 3, scales="free_y")
 p + theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10))
 ```
+```{r relabund_melt}
+biom.relabund.melt <- psmelt(biom.relabund)
+head(biom.relabund.melt)
+```
+```{r relabund_stats_estplot_Genus, fig.height=10, fig.width=100}
+biom.relabund.melt.est <- summarySE(biom.relabund.melt, measurevar="Abundance", groupvars=c("Genus"))
+head(biom.relabund.melt.est)
+p <- ggplot(biom.relabund.melt.est, aes(x=Genus, y=Abundance)) + geom_point() +  geom_errorbar(aes(ymin=Abundance-se, ymax=Abundance+se))
+p + theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10))
+```
+```{r relabund_stats_estplot_Phylum}
+biom.relabund.melt.est <- summarySE(biom.relabund.melt, measurevar="Abundance", groupvars=c("Phylum"))
+head(biom.relabund.melt.est)
+p <- ggplot(biom.relabund.melt.est, aes(x=Phylum, y=Abundance)) + geom_point() +  geom_errorbar(aes(ymin=Abundance-se, ymax=Abundance+se))
+p + theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10))
+```
