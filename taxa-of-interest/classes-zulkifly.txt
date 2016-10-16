@@ -1,0 +1,14 @@
+Alphaproteobacteria
+Betaproetobacteria
+Deltaproteobacteria
+Gammaproteobacteria
+Sphingobacteria
+Flavobacteria
+Bacterioidia
+Planctomycetes
+Verrucomicrobia
+Deinococcus-Thermus
+Gemmatimonadetes
+Fusobacteria
+Nitrospirae
+Lentisphaerae
