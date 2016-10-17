@@ -26,6 +26,7 @@ library(doParallel)
 library(vegan)
 library(grid)
 library(gridExtra)
+library(reshape2)
 ```
 ``` {r load_data, results="hide"}
 # Load biom file. 
@@ -52,7 +53,8 @@ ordNMDS.k3 <- ordinate(biom.relabund, method="NMDS", distance="bray", k=3)
 ord.k3 <- plot_ordination(biom.relabund, ordNMDS.k3, shape="Site", color = "Date") + geom_point(size=2)
 ord.k3 + labs(title = "Cladophora, 2014") + theme_bw() + scale_colour_hue(h=c(300, 500))
 ```
-```{r adonis}
+```{r permanova}
+# PERMANOVA. 
 df = as(sample_data(biom), "data.frame")
 d = phyloseq::distance(biom, "bray")
 clado.adonis = adonis(d ~ Date*Site, df)
@@ -146,8 +148,8 @@ p + theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1
 ```
 ```{r phyla_abundance}
 # We want to calculate the total relative abundance of each phylum. 
-# "melt" the phyloseq data into a dataframe and then take the top X most abundant phyla. 
-biom.melt <- psmelt(biom)
+# "Melt" the phyloseq data into a dataframe and then take the top X most abundant phyla. 
+biom.melt <- psmelt(biom.relabund)
 biom.melt.sorted <- biom.melt %>%
   group_by(Sample,Phylum) %>%
   summarize(PhyAbund = sum(Abundance))%>%
@@ -157,13 +159,13 @@ biom.melt.sorted <- biom.melt %>%
 ```
 ```{r top_phyla_abundance}
 # List of nPhyla top most abundant phyla. 
-nPhyla = 13
+nPhyla =16
 PhylumList <- biom.melt.sorted[1:nPhyla,1]
 PhylumList <- PhylumList[is.na(PhylumList)==FALSE,]
 PhylumList <- levels(droplevels(as.factor(PhylumList$Phylum)))
 PhylumList
 # Subset biom.melt for phyla. 
-biom.subset <- subset_taxa(biom, Phylum %in% PhylumList)
+biom.subset <- subset_taxa(biom.relabund, Phylum %in% PhylumList)
 biom.subset.melt <- psmelt(biom.subset)
 biom.subset.melt.sorted = biom.subset.melt %>%
   group_by(Sample,Site,Date,Phylum) %>%
@@ -178,8 +180,8 @@ biom.subset.melt.sorted.est$Date <- as.numeric(biom.subset.melt.sorted.est$Date)
 ```
 ```{r plot_phylum_abundance_est, fig.width=8, fig.height=8}
 # Plot top phyla abundances. 
-p <- ggplot(biom.subset.melt.sorted.est, aes(x=Date, y=PhyAbund, color = Site)) + geom_point() +  geom_errorbar(aes(ymin=PhyAbund-se, ymax=PhyAbund+se)) +  geom_line() + facet_wrap(~Phylum, ncol = 3, scales="free_y") + scale_colour_hue(h=c(400, 120))
-p + theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10)) + labs(x="Amendment",y="Relative abundance")
+p <- ggplot(biom.subset.melt.sorted.est, aes(x=Date, y=PhyAbund, color = Site)) + geom_point() +  geom_errorbar(aes(ymin=PhyAbund-se, ymax=PhyAbund+se)) +  geom_line() + facet_wrap(~Phylum, ncol = 3, scales="free_y") + scale_colour_hue(h=c(400,120))
+p + theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10)) + labs(x="Date",y="Relative Abundance") 
 ```
 ```{r top30_classes}
 # Find top 30 classes and subset biom.relabund. 
@@ -302,7 +304,7 @@ p + theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1
 ```
 ```{r classes_zulk_of_interest}
 # Find classes_zulk of interest and subset biom.relabund. 
-classzulk <- read.csv(file ="taxa-of-interest/classes-zulkifly.txt", header = T)
+classzulk <- read.csv(file = "taxa-of-interest/classes-zulkifly.txt", header = T)
 classzulk.list <- as.vector(classzulk$Class)
 biom.relabund.subset.classzulk = subset_taxa(biom.relabund, Class %in% classzulk.list)
 biom.relabund.subset.classzulk.taxa <- subset_taxa(biom.relabund.subset.classzulk, Class %in% as.factor(classzulk.list))
@@ -316,14 +318,33 @@ head(relabund.classzulk.class)
 ```
 ```{r est_classes_zulk_of_interest}
 # Summary of class abundance of classes_zulk of interest. 
-relabund.classzulk.class.est <- summarySE(relabund.classzulk.class, measurevar="ClassAbundance", groupvars=c("Site","Date","Class"))
+relabund.classzulk.class.est <- summarySE(relabund.classzulk.class, measurevar= "ClassAbundance", groupvars=c("Site","Date","Class"))
 head(relabund.classzulk.class.est)
 relabund.classzulk.class.est$Date <- as.character(relabund.classzulk.class.est$Date)
 relabund.classzulk.class.est$Date <- as.numeric(relabund.classzulk.class.est$Date)
 ```
 ```{r plot_classes_zulk_of_interest_merged, fig.width=6.5, fig.height=6}
 # Plot MERGED summary of class abundance of classes_zulk of interest and Zulkifly et al. class abundances. 
-relabund.classzulk.class.est.merge <- merge(relabund.classzulk.class.est, classzulk, by ="Class")
+relabund.classzulk.class.est.merge <- merge(relabund.classzulk.class.est, classzulk, by = "Class")
+relabund.classzulk.class.est.merge
 p <- ggplot(relabund.classzulk.class.est.merge, aes(x=Date, y=ClassAbundance, color = Site)) + geom_point() +  geom_errorbar(aes(ymin=ClassAbundance-se, ymax=ClassAbundance+se)) +  geom_line() + facet_wrap(~Class, ncol = 3, scales="free_y") + scale_colour_hue(h=c(400, 120)) + geom_hline(aes(yintercept = ClassAbundance_zulkifly), linetype="dashed")+ scale_colour_hue(h=c(400, 120))
 p + theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10))
+```
+```{r est_classes_zulk_all_nosplit}
+# Summary of class abundance of classes_zulk of interest. 
+relabund.classzulk.class.est.nosplit <- summarySE(relabund.classzulk.class, measurevar= "ClassAbundance", groupvars=c("Class"))
+head(relabund.classzulk.class.est.nosplit)
+relabund.classzulk.class.est.merge.nosplit <- merge(relabund.classzulk.class.est.nosplit, classzulk, by ="Class")
+relabund.classzulk.class.est.merge.nosplit
+```
+```{r plot_est_classes_zulk_all_nosplit}
+df <- relabund.classzulk.class.est.merge.nosplit
+p <- ggplot(df, aes(Class)) 
+p + geom_point(aes(y = df$ClassAbundance, color = "Braus 2016 (2014)")) + 
+  geom_point(aes(y = df$ClassAbundance_zulkifly, color = "Zulkifly 2012 (2011)")) + 
+  labs(title ="Cladophora, Lake Mendota") +
+  ylab("Relative Abundance")+ 
+  guides(color=guide_legend(title="Growth Season")) + 
+  theme_bw() + 
+  theme(axis.text.x = element_text(size = 10, angle = 55, hjust=1),axis.text.y = element_text(size = 10))
 ```

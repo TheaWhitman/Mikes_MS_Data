@@ -8,3 +8,6 @@ Flavobacteriia,.07
 Planctomycetia,.05
 Verrucomicrobiae,.04
 Deinococci,.03
+Gemmatimonadetes,0.01
+Nitrospira,0.01
+Bacteroidia,0.01
