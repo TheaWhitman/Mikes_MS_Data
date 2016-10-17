@@ -8,6 +8,7 @@ Leadbetterella
 Leptolyngbya
 Meiothermus
 Methylotenera
+Methylomonas
 Pseudomonas
 Rhodobacter
 Sediminibacterium

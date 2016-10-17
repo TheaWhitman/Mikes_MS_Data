@@ -74,7 +74,7 @@ biom.rich.est.obs <- summarySE(biom.rich.est, measurevar="Observed", groupvars=c
 p.obs <- ggplot(biom.rich.est.obs, aes(x=Date, y=Observed, color = Site)) + geom_point() +  geom_errorbar(aes(ymin=Observed-se, ymax=Observed+se)) + geom_line() + scale_colour_hue(h=c(400, 120))
 p.obs + theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10))
 ```
-```{r plot_richness_sha}
+```{r plot_richness_sha, fig.height=2, fig.width=3}
 # Plot Shanon index richness. 
 biom.rich.est.sha <- summarySE(biom.rich.est, measurevar="Shannon", groupvars=c("Date","Site"))
 p.sha <- ggplot(biom.rich.est.sha, aes(x=Date, y=Shannon, color = Site)) + geom_point() +  geom_errorbar(aes(ymin=Shannon-se, ymax=Shannon+se)) + geom_line() + scale_colour_hue(h=c(400, 120))
@@ -178,7 +178,7 @@ head(biom.subset.melt.sorted.est)
 biom.subset.melt.sorted.est$Date <- as.character(biom.subset.melt.sorted.est$Date)
 biom.subset.melt.sorted.est$Date <- as.numeric(biom.subset.melt.sorted.est$Date)
 ```
-```{r plot_phylum_abundance_est, fig.width=8, fig.height=8}
+```{r plot_phylum_abundance_est, fig.width=6.5, fig.height=6}
 # Plot top phyla abundances. 
 p <- ggplot(biom.subset.melt.sorted.est, aes(x=Date, y=PhyAbund, color = Site)) + geom_point() +  geom_errorbar(aes(ymin=PhyAbund-se, ymax=PhyAbund+se)) +  geom_line() + facet_wrap(~Phylum, ncol = 3, scales="free_y") + scale_colour_hue(h=c(400,120))
 p + theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10)) + labs(x="Date",y="Relative Abundance") 
@@ -247,8 +247,7 @@ clado.depth <- subset(data, depth<=1.5, select = year4:wtemp)
 p <- qplot(clado.depth$daynum, y = clado.depth$wtemp)
 p <- p + geom_point(aes(colour = clado.depth$year4), size=1, alpha = 0.8) + 
   scale_y_continuous(limits = c(4,30))+
-  labs(title = "Water Temperature <1.5m Depth, Lake Mendota") + 
-  xlab("Julian Day") + ylab("Temperature °C")+ 
+  xlab("Date") + ylab("Temperature °C")+ 
   geom_vline(xintercept=Jdays, colour="darkgreen", linetype = "longdash") +
   guides(color=guide_legend(title="Year")) + 
   scale_colour_gradient(low = "darkred")
@@ -260,7 +259,7 @@ clado.depth.zoom <- subset(clado.depth, daynum>=150 & daynum<=250, select = year
 p <- qplot(clado.depth.zoom$daynum, y = clado.depth.zoom$wtemp) + 
   scale_y_continuous(limits = c(10,30))+
   geom_point(aes(colour = clado.depth.zoom$year4), size=1, alpha = 0.8) + 
-  labs(title = "Water Temperature <1.5m Depth, Lake Mendota", x="Julian Day", y="Temperature °C") + 
+  labs(title = "Water Temperature <1.5m Depth, Lake Mendota", x="Date", y="Temperature °C") + 
   geom_vline(xintercept=Jdays, colour="darkgreen", linetype = "longdash") + 
   guides(color=guide_legend(title="Year")) + scale_colour_gradient(low = "darkred")
 p+ theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10))
@@ -273,12 +272,12 @@ p <- p + geom_point(size = 0.5) +
   facet_wrap(~year4, ncol = 3) + 
   geom_vline(xintercept=Jdays, colour="grey30", linetype = "longdash") +
   guides(color=guide_legend(title="Year")) +
-  labs(title = "Water Temperature <1.5m Depth, Lake Mendota", x="Julian Day", y="Temperature °C")
+  labs(title = "Water Temperature <1.5m Depth, Lake Mendota", x="Date", y="Temperature °C")
 p + theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10))
 ```
 ```{r genera_of_interest}
 # Find genera of interest and subset biom.relabund. 
-genofint <- read.table(file = "taxa-of-interest/genera-of-interest.txt")
+genofint <- read.table(file ="taxa-of-interest/genera-of-interest.txt")
 genofint.list <- as.vector(genofint$V1)
 biom.relabund.subset.genofint = subset_taxa(biom.relabund, Genus %in% genofint.list)
 biom.relabund.subset.genofint.taxa <- subset_taxa(biom.relabund.subset.genofint, Genus %in% as.factor(genofint.list))
@@ -292,15 +291,15 @@ head(relabund.genofint.genus)
 ```
 ```{r est_genera_of_interest}
 # Summary of genus abundance of genera of interest. 
-relabund.genofint.genus.est <- summarySE(relabund.genofint.genus, measurevar="GenusAbundance", groupvars=c("Site","Date", "Genus"))
+relabund.genofint.genus.est <- summarySE(relabund.genofint.genus, measurevar="GenusAbundance", groupvars=c("Site","Date","Genus"))
 head(relabund.genofint.genus.est)
 relabund.genofint.genus.est$Date <- as.character(relabund.genofint.genus.est$Date)
 relabund.genofint.genus.est$Date <- as.numeric(relabund.genofint.genus.est$Date)
 ```
-```{r plot_genera_of_interest, fig.width=4.5, fig.height=9}
+```{r plot_genera_of_interest, fig.width=6.5, fig.height=6}
 # Plot summary of genus abundance of genera of interest. 
-p <- ggplot(relabund.genofint.genus.est, aes(x=Date, y=GenusAbundance, color = Site)) + geom_point() +  geom_errorbar(aes(ymin=GenusAbundance-se, ymax=GenusAbundance+se)) +  geom_line() + facet_wrap(~Genus, ncol = 2, scales="free_y") + scale_colour_hue(h=c(400, 120))
-p + theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10))
+p <- ggplot(relabund.genofint.genus.est, aes(x=Date, y=GenusAbundance, color = Site)) + geom_point() +  geom_errorbar(aes(ymin=GenusAbundance-se, ymax=GenusAbundance+se)) +  geom_line() + facet_wrap(~Genus, ncol = 3, scales="free_y") + scale_colour_hue(h=c(400, 120))
+p + theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10)) + ylab("Relative Abundance")
 ```
 ```{r classes_zulk_of_interest}
 # Find classes_zulk of interest and subset biom.relabund. 
@@ -332,19 +331,22 @@ p + theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1
 ```
 ```{r est_classes_zulk_all_nosplit}
 # Summary of class abundance of classes_zulk of interest. 
-relabund.classzulk.class.est.nosplit <- summarySE(relabund.classzulk.class, measurevar= "ClassAbundance", groupvars=c("Class"))
+relabund.classzulk.class.est.nosplit <- summarySE(relabund.classzulk.class.est, measurevar= "ClassAbundance", groupvars=c("Class"))
 head(relabund.classzulk.class.est.nosplit)
 relabund.classzulk.class.est.merge.nosplit <- merge(relabund.classzulk.class.est.nosplit, classzulk, by ="Class")
 relabund.classzulk.class.est.merge.nosplit
 ```
-```{r plot_est_classes_zulk_all_nosplit}
+```{r plot_est_classes_zulk_all_nosplit, fig.width=5, fig.height=4}
 df <- relabund.classzulk.class.est.merge.nosplit
+limits <- aes(ymin=df$ClassAbundance-df$ci, ymax=df$ClassAbundance+df$ci)
 p <- ggplot(df, aes(Class)) 
-p + geom_point(aes(y = df$ClassAbundance, color = "Braus 2016 (2014)")) + 
-  geom_point(aes(y = df$ClassAbundance_zulkifly, color = "Zulkifly 2012 (2011)")) + 
-  labs(title ="Cladophora, Lake Mendota") +
+p + geom_point(aes(y = df$ClassAbundance, color = "Braus 2016 (2014)"), size = 3, alpha = 0.5) + 
+  geom_errorbar(limits, color = "darkred") +
+  geom_point(aes(y = df$ClassAbundance_zulkifly, color = "Zulkifly 2012 (2011)"), size = 3, alpha = 0.5) + 
+  scale_y_continuous(limits = c(0,.25))+
   ylab("Relative Abundance")+ 
   guides(color=guide_legend(title="Growth Season")) + 
   theme_bw() + 
+  theme(legend.position="top")+ 
   theme(axis.text.x = element_text(size = 10, angle = 55, hjust=1),axis.text.y = element_text(size = 10))
 ```
