@@ -1,0 +1,8 @@
+# Update QIIME
+$ sudo pip install --upgrade qiime
+
+# Switch to QIIME
+# Convert fna+qual files to fastq. 
+# http://qiime.org/scripts/convert_fastaqual_fastq.html
+$ convert_fastaqual_fastq.py -f G125_combined.fna -q G125_combined.qual -c fastaqual_to_fastq -b -o fastq_files/
+
