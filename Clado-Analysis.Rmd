@@ -49,9 +49,21 @@ biom.relabund <- transform_sample_counts(biom, function(x) x / sum(x))
 # Ordination plot, k = 3. 
 ordNMDS.k3 <- ordinate(biom.relabund, method="NMDS", distance="bray", k=3)
 ```
-```{r plot_ordination}
+```{r plot_ordination, fig.height=3.5}
 ord.k3 <- plot_ordination(biom.relabund, ordNMDS.k3, shape="Site", color = "Date") + geom_point(size=2)
-ord.k3 + labs(title = "Cladophora, 2014") + theme_bw() + scale_colour_hue(h=c(300, 500))
+ord.k3 + theme_bw() + scale_colour_hue(h=c(300, 500))
+```
+```{r plot_ordination_messy, fig.height=3.5}
+ord.k3 <- plot_ordination(biom.relabund, ordNMDS.k3, shape="Site", color = "Date") + geom_point(size=5)
+ord.k3 + theme_bw() + scale_colour_hue(h=c(300, 500))+
+  geom_point(colour="white", size = 3)+
+  geom_point(colour="black", size = 1)
+```
+```{r plot_ordination_bw, fig.height=3.5}
+ord.k3 <- plot_ordination(biom.relabund, ordNMDS.k3, shape="Site", color = "Date") + geom_point(size=5)
+ord.k3 + theme_bw() + scale_colour_manual(values=c("grey20", "grey30", "grey40", "grey50", "grey60", "grey70")) +
+  geom_point(colour="white", size = 3)+
+  geom_point(colour="black", size = 1)
 ```
 ```{r permanova}
 # PERMANOVA. 
@@ -69,16 +81,32 @@ biom.rich.est$Date <- as.numeric(biom.rich.est$Date)
 head(biom.rich.est)
 ```
 ```{r plot_richness_obs}
+cbPalette <- c("#b5b5b5", "#777777", "#212121")
 # Plot observed richness. 
 biom.rich.est.obs <- summarySE(biom.rich.est, measurevar="Observed", groupvars=c("Date","Site"))
-p.obs <- ggplot(biom.rich.est.obs, aes(x=Date, y=Observed, color = Site)) + geom_point() +  geom_errorbar(aes(ymin=Observed-se, ymax=Observed+se)) + geom_line() + scale_colour_hue(h=c(400, 120))
+p.obs <- ggplot(biom.rich.est.obs, aes(x=Date, y=Observed, color = Site)) + geom_point() +  geom_errorbar(aes(ymin=Observed-se, ymax=Observed+se)) + geom_line() + scale_colour_manual(values=cbPalette)
+  #scale_colour_hue(h=c(400, 120))
 p.obs + theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10))
 ```
-```{r plot_richness_sha, fig.height=2, fig.width=3}
+```{r plot_richness_sha, fig.height=3, fig.width=4}
 # Plot Shanon index richness. 
 biom.rich.est.sha <- summarySE(biom.rich.est, measurevar="Shannon", groupvars=c("Date","Site"))
-p.sha <- ggplot(biom.rich.est.sha, aes(x=Date, y=Shannon, color = Site)) + geom_point() +  geom_errorbar(aes(ymin=Shannon-se, ymax=Shannon+se)) + geom_line() + scale_colour_hue(h=c(400, 120))
-p.sha + theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10))
+p.sha <- ggplot(biom.rich.est.sha, aes(x=Date, y=Shannon, color = Site)) + 
+  geom_point() +  geom_errorbar(aes(ymin=Shannon-se, ymax=Shannon+se)) + 
+  geom_line() + scale_colour_hue(h=c(400, 120))
+p.sha + 
+  theme_bw() + 
+  theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10))
+```
+```{r plot_richness_sha_bw, fig.height=3, fig.width=4}
+# Plot Shanon index richness. 
+biom.rich.est.sha <- summarySE(biom.rich.est, measurevar="Shannon", groupvars=c("Date","Site"))
+p.sha <- ggplot(biom.rich.est.sha, aes(x=Date, y=Shannon, color = Site)) + 
+  geom_point() +  geom_errorbar(aes(ymin=Shannon-se, ymax=Shannon+se)) + 
+  geom_line() + scale_colour_manual(values=cbPalette)
+p.sha + 
+  theme_bw() + 
+  theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10))
 ```
 ```{r top30_genera, fig.height=15, fig.width=8}
 # Find top 30 genera and subset biom.relabund. 
@@ -183,6 +211,11 @@ biom.subset.melt.sorted.est$Date <- as.numeric(biom.subset.melt.sorted.est$Date)
 p <- ggplot(biom.subset.melt.sorted.est, aes(x=Date, y=PhyAbund, color = Site)) + geom_point() +  geom_errorbar(aes(ymin=PhyAbund-se, ymax=PhyAbund+se)) +  geom_line() + facet_wrap(~Phylum, ncol = 3, scales="free_y") + scale_colour_hue(h=c(400,120))
 p + theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10)) + labs(x="Date",y="Relative Abundance") 
 ```
+```{r plot_phylum_abundance_est_bw, fig.width=6.5, fig.height=6}
+# Plot top phyla abundances. 
+p <- ggplot(biom.subset.melt.sorted.est, aes(x=Date, y=PhyAbund, color = Site)) + geom_point() +  geom_errorbar(aes(ymin=PhyAbund-se, ymax=PhyAbund+se)) +  geom_line() + facet_wrap(~Phylum, ncol = 3, scales="free_y") + scale_colour_manual(values=cbPalette)
+p + theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10)) + labs(x="Date",y="Relative Abundance") 
+```
 ```{r top30_classes}
 # Find top 30 classes and subset biom.relabund. 
 sort.classes <- sort(tapply(taxa_sums(biom.relabund), tax_table(biom.relabund)[, "Class"], sum), TRUE)
@@ -247,8 +280,8 @@ clado.depth <- subset(data, depth<=1.5, select = year4:wtemp)
 p <- qplot(clado.depth$daynum, y = clado.depth$wtemp)
 p <- p + geom_point(aes(colour = clado.depth$year4), size=1, alpha = 0.8) + 
   scale_y_continuous(limits = c(4,30))+
-  xlab("Date") + ylab("Temperature °C")+ 
-  geom_vline(xintercept=Jdays, colour="darkgreen", linetype = "longdash") +
+  xlab("Date") + ylab("Temperature (°C)")+ 
+  geom_vline(xintercept=Jdays, colour="darkgrey", linetype = "longdash") +
   guides(color=guide_legend(title="Year")) + 
   scale_colour_gradient(low = "darkred")
 p+ theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10))
@@ -259,7 +292,7 @@ clado.depth.zoom <- subset(clado.depth, daynum>=150 & daynum<=250, select = year
 p <- qplot(clado.depth.zoom$daynum, y = clado.depth.zoom$wtemp) + 
   scale_y_continuous(limits = c(10,30))+
   geom_point(aes(colour = clado.depth.zoom$year4), size=1, alpha = 0.8) + 
-  labs(title = "Water Temperature <1.5m Depth, Lake Mendota", x="Date", y="Temperature °C") + 
+  labs(title = "Water Temperature (°C) <1.5m Depth, Lake Mendota", x="Date", y="Temperature °C") + 
   geom_vline(xintercept=Jdays, colour="darkgreen", linetype = "longdash") + 
   guides(color=guide_legend(title="Year")) + scale_colour_gradient(low = "darkred")
 p+ theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10))
@@ -272,7 +305,7 @@ p <- p + geom_point(size = 0.5) +
   facet_wrap(~year4, ncol = 3) + 
   geom_vline(xintercept=Jdays, colour="grey30", linetype = "longdash") +
   guides(color=guide_legend(title="Year")) +
-  labs(title = "Water Temperature <1.5m Depth, Lake Mendota", x="Date", y="Temperature °C")
+  labs(title = "Water Temperature (°C) <1.5m Depth, Lake Mendota", x="Date", y="Temperature °C")
 p + theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10))
 ```
 ```{r plot_est_wtemp_not2014}
@@ -280,13 +313,13 @@ clado.depth.not14 <- subset(clado.depth, year4!=2014)
 clado.depth.est.not14 <- summarySE(clado.depth.not14, measurevar= "wtemp", groupvars=c("daynum"))
 head(clado.depth.est.not14)
 p <- ggplot(clado.depth.est.not14, aes(x=daynum, y=wtemp)) + 
-  geom_point() +  
+  geom_point(size = 0.5) +  
   geom_errorbar(aes(ymin=wtemp-se, ymax=wtemp+se)) + geom_line()+
-  geom_vline(xintercept=Jdays, colour="darkgreen", linetype = "longdash") + 
-  labs(x="Date", y="Temperature °C at depths <1.5m")
+  geom_vline(xintercept=Jdays, colour="darkgrey", linetype = "longdash") + 
+  labs(x="Date", y="Temperature (°C) depths ≤1.5m")
 p + theme_bw() + 
   scale_y_continuous(limits = c(10,26))+
-  scale_x_continuous(limits = c(120,320))
+  scale_x_continuous(limits = c(120,320))+
   theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10))
 ```
 ```{r genera_of_interest}
@@ -313,6 +346,11 @@ relabund.genofint.genus.est$Date <- as.numeric(relabund.genofint.genus.est$Date)
 ```{r plot_genera_of_interest, fig.width=6.5, fig.height=6}
 # Plot summary of genus abundance of genera of interest. 
 p <- ggplot(relabund.genofint.genus.est, aes(x=Date, y=GenusAbundance, color = Site)) + geom_point() +  geom_errorbar(aes(ymin=GenusAbundance-se, ymax=GenusAbundance+se)) +  geom_line() + facet_wrap(~Genus, ncol = 3, scales="free_y") + scale_colour_hue(h=c(400, 120))
+p + theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10)) + ylab("Relative Abundance")
+```
+```{r plot_genera_of_interest_bw, fig.width=6.5, fig.height=6}
+# Plot summary of genus abundance of genera of interest. 
+p <- ggplot(relabund.genofint.genus.est, aes(x=Date, y=GenusAbundance, color = Site)) + geom_point() +  geom_errorbar(aes(ymin=GenusAbundance-se, ymax=GenusAbundance+se)) +  geom_line() + facet_wrap(~Genus, ncol = 3, scales="free_y") + scale_colour_manual(values=cbPalette)
 p + theme_bw() + theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10)) + ylab("Relative Abundance")
 ```
 ```{r classes_zulk_of_interest}
@@ -354,7 +392,7 @@ relabund.classzulk.class.est.merge.nosplit
 ```
 ```{r plot_est_classes_zulk_all_nosplit, fig.width=8, fig.height=5}
 df <- relabund.classzulk.class.est.merge.nosplit
-limits <- aes(ymin= ClassAbundance-ci, ymax= ClassAbundance+ci)
+limits <- aes(ymin = ClassAbundance-se, ymax= ClassAbundance+se)
 p <- ggplot(df, aes(Class))
 p <- p + 
   ylab("Relative Abundance")+
@@ -362,11 +400,30 @@ p <- p +
   guides(color=guide_legend(title="Growth Season")) + 
   theme_bw() + 
   theme(legend.position="top")+
-  theme(strip.text.x = element_text(size = 8, colour = "blue", angle = 90))+
+  theme(strip.text.x = element_text(size = 8, angle = 90))+
   theme(axis.text.x = element_text(size = 10, angle = 55, hjust=1),axis.text.y = element_text(size = 10))+
-  geom_point(aes(y = ClassAbundance, color = "Braus 2016 (2014)"), size = 3, alpha = 0.5) + 
-  geom_errorbar(limits, color = "darkred", width=0.5) +
-  geom_point(aes(y = ClassAbundance_zulkifly, color = "Zulkifly 2012 (2011)"), size = 3, alpha = 0.5)
+  geom_point(aes(y = ClassAbundance, color = "2014 (this study)  "), size = 3, alpha = 0.5) + 
+  geom_errorbar(limits, color = "darkblue", width=0.5)+
+  geom_point(aes(y = ClassAbundance_zulkifly, color = "2011 (Zulkifly et al., 2012)"), size = 3, alpha = 0.5)+
+  scale_colour_manual(values=cbPalette)
+p
+```
+```{r plot_est_classes_zulk_all_nosplit_MANUAL_bw, fig.width=8, fig.height=5}
+#write.csv(relabund.classzulk.class.est.merge.nosplit, file = "~/Dropbox/clado-manuscript/Mikes_MS_Data/braus-zulkifly.csv")
+df <- read.csv(file = "~/Dropbox/clado-manuscript/Mikes_MS_Data/braus-zulkifly.csv")
+limits <- aes(ymin = ClassAbundance-se, ymax= ClassAbundance+se)
+p <- ggplot(df, aes(Class, color = Year))
+p <- p + 
+  geom_point(aes(y = ClassAbundance), size = 2) + 
+  geom_errorbar(limits, color = "black", width=0.5) +
+  ylab("Relative Abundance") +
+  facet_grid(~Phylum, scales = "free", space="free") +
+  guides(color=guide_legend(title="Growth Season")) + 
+  theme_bw() + 
+  theme(legend.position="top") +
+  theme(strip.text.x = element_text(size = 8, angle = 90)) +
+  theme(axis.text.x = element_text(size = 10, angle = 55, hjust=1),axis.text.y = element_text(size = 10)) +
+  scale_colour_manual(values=c("#b5b5b5", "#212121"))
 p
 ```
 <!-- REANALYSIS OF ZULKIFLY, ET AL., 2012 -->
