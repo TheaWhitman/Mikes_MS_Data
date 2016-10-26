@@ -322,6 +322,38 @@ p + theme_bw() +
   scale_x_continuous(limits = c(120,320))+
   theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10))
 ```
+```{r plot_est_wtemp_not2014_deep_SE10years}
+clado.depth.deep <- subset(clado.depth, depth>0)
+clado.depth.not14 <- subset(clado.depth.deep, year4!=2014)
+clado.depth.est.not14 <- summarySE(clado.depth.not14, measurevar= "wtemp", groupvars=c("daynum", "year4"))
+clado.depth.est.not14.est <- summarySE(clado.depth.est.not14, measurevar= "wtemp", groupvars=c("daynum"))
+head(clado.depth.est.not14.est)
+p <- ggplot(clado.depth.est.not14.est, aes(x=daynum, y=wtemp)) + 
+  geom_point(size = 0.5) +  
+  geom_errorbar(aes(ymin=wtemp-se, ymax=wtemp+se)) + geom_line()+
+  geom_vline(xintercept=Jdays, colour="darkgreen", linetype = "longdash") + 
+  labs(x="Date", y="Temperature (°C), 0.5-1.5m")
+p + theme_bw() + 
+  scale_y_continuous(limits = c(10,26))+
+  scale_x_continuous(limits = c(120,320))+
+  theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10))
+```
+```{r plot_est_wtemp_not2014_deep_SE10years_bw}
+clado.depth.deep <- subset(clado.depth, depth>0)
+clado.depth.not14 <- subset(clado.depth.deep, year4!=2014)
+clado.depth.est.not14 <- summarySE(clado.depth.not14, measurevar= "wtemp", groupvars=c("daynum", "year4"))
+clado.depth.est.not14.est <- summarySE(clado.depth.est.not14, measurevar= "wtemp", groupvars=c("daynum"))
+head(clado.depth.est.not14.est)
+p <- ggplot(clado.depth.est.not14.est, aes(x=daynum, y=wtemp)) + 
+  geom_point(size = 0.5) +  
+  geom_errorbar(aes(ymin=wtemp-se, ymax=wtemp+se)) + geom_line()+
+  geom_vline(xintercept=Jdays, colour="grey10", linetype = "longdash") + 
+  labs(x="Date", y="Temperature (°C), 0.5-1.5m")
+p + theme_bw() + 
+  scale_y_continuous(limits = c(10,26))+
+  scale_x_continuous(limits = c(120,320))+
+  theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1),axis.text.y = element_text(size = 10))
+```
 ```{r genera_of_interest}
 # Find genera of interest and subset biom.relabund. 
 genofint <- read.table(file ="taxa-of-interest/genera-of-interest.txt")
