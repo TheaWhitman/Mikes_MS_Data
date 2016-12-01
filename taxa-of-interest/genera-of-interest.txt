@@ -1,9 +1,12 @@
 Armatimonas
 Bdellovibrio
+Cellvibrio
+CM44
 Crenothrix
+Dechloromonas
 Flavobacterium
 Flectobacillus
-Fluviicola
+Hyphomicrobium
 Leadbetterella
 Leptolyngbya
 Meiothermus
