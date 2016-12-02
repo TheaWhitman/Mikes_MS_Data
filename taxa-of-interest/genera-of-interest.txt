@@ -1,8 +1,6 @@
 Armatimonas
-Bdellovibrio
 Cellvibrio
 CM44
-Crenothrix
 Dechloromonas
 Flavobacterium
 Flectobacillus
@@ -11,7 +9,6 @@ Leadbetterella
 Leptolyngbya
 Meiothermus
 Methylotenera
-Methylomonas
 Pseudomonas
 Rhodobacter
 Sediminibacterium
